@@ -99,11 +99,11 @@ User.belongsTo(UserRole)
 AirportCity.hasMany(Flight)
 Flight.belongsTo(AirportCity)
 
-Flight.hasMany(Ticket)
-Ticket.belongsTo(Flight)
-
-Passenger.hasMany(Ticket)
-Ticket.belongsTo(Passenger)
+// Flight.hasMany(Ticket)
+// Ticket.belongsTo(Flight)
+//
+// Passenger.hasMany(Ticket)
+// Ticket.belongsTo(Passenger)
 
 module.exports = {
     User,
