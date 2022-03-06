@@ -62,7 +62,8 @@ const Flight = sequelize.define('flight', {
     number: {
         primaryKey: true,
         type: DataTypes.STRING,
-        allowNull: false
+        allowNull: false,
+        unique: true
     },
     departureDate: {
         primaryKey: true,
@@ -86,8 +87,19 @@ const Flight = sequelize.define('flight', {
 })
 
 const Ticket = sequelize.define('ticket', {
-    place: {
-        type: DataTypes.STRING
+    flight: {
+        type: DataTypes.STRING,
+        references: {
+            model: Flight,
+            key: 'number'
+        }
+    },
+    passenger: {
+        type: DataTypes.STRING,
+        references: {
+            model: Passenger,
+            key: 'passport'
+        }
     }
 }, {
     timestamps: false
@@ -98,6 +110,9 @@ User.belongsTo(UserRole)
 
 AirportCity.hasMany(Flight)
 Flight.belongsTo(AirportCity)
+
+Flight.belongsToMany(Passenger, {through: Ticket})
+Passenger.belongsToMany(Flight, {through: Ticket})
 
 // Flight.hasMany(Ticket)
 // Ticket.belongsTo(Flight)
