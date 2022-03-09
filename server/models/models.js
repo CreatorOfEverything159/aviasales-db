@@ -59,14 +59,16 @@ const AirportCity = sequelize.define('airportCity', {
 })
 
 const Flight = sequelize.define('flight', {
-    number: {
+    id: {
         primaryKey: true,
+        type: DataTypes.INTEGER,
+        autoIncrement: true
+    },
+    number: {
         type: DataTypes.STRING,
-        allowNull: false,
-        unique: true
+        allowNull: false
     },
     departureDate: {
-        primaryKey: true,
         type: DataTypes.DATE,
         allowNull: false
     },
@@ -86,24 +88,7 @@ const Flight = sequelize.define('flight', {
     timestamps: false
 })
 
-const Ticket = sequelize.define('ticket', {
-    flight: {
-        type: DataTypes.STRING,
-        references: {
-            model: Flight,
-            key: 'number'
-        }
-    },
-    passenger: {
-        type: DataTypes.STRING,
-        references: {
-            model: Passenger,
-            key: 'passport'
-        }
-    }
-}, {
-    timestamps: false
-})
+const Ticket = sequelize.define('ticket', {}, { timestamps: false })
 
 UserRole.hasMany(User)
 User.belongsTo(UserRole)
@@ -113,12 +98,6 @@ Flight.belongsTo(AirportCity)
 
 Flight.belongsToMany(Passenger, {through: Ticket})
 Passenger.belongsToMany(Flight, {through: Ticket})
-
-// Flight.hasMany(Ticket)
-// Ticket.belongsTo(Flight)
-//
-// Passenger.hasMany(Ticket)
-// Ticket.belongsTo(Passenger)
 
 module.exports = {
     User,
