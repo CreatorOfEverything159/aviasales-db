@@ -1,29 +1,38 @@
-const {User} = require('../models/models')
-const jwt = require("jsonwebtoken");
+const {User, UserRole, Passenger, Ticket} = require('../models/models')
+const jwt = require('jsonwebtoken')
 
-const genToken = (login, userRoleId) => {
-    return jwt.sign({login, userRoleId}, process.env.SECRET_KEY, {expiresIn: '6h'})
+const genToken = (login, userRole, passengerPassport, fio, tickets) => {
+    return jwt.sign({login, userRole, passengerPassport, fio, tickets}, process.env.SECRET_KEY, {expiresIn: '6h'})
 }
 
 class UserController {
 
     async registration(req, res, next) {
-        const {login, password, userRoleId} = req.body
+        const {login, password, userRole, fio, passport} = req.body
         let user = await User.findOne({where: {login}})
         if (user) {
             return next() // TODO Error
         }
-        user = await User.create({login, password, userRoleId})
-        return res.json(user)
+        let passenger = await Passenger.findOne({where: {passport}})
+        if (passenger) {
+            return next() // TODO Error
+        }
+        const role = await UserRole.findOne({where: {role: userRole}})
+        await Passenger.create({passport, fio})
+        await User.create({login, password, userRoleId: role.id, passengerPassport: passport})
+        return res.json({message: 'nice!'})
     }
 
-    async login(req, res, next) {
+    async authorization(req, res, next) {
         const {login, password} = req.body
         const user = await User.findOne({where: {login, password}})
         if (!user) {
             return next() // TODO Error
         }
-        const token = genToken(user.login, user.userRoleId)
+        const role = await UserRole.findOne({where: {id: user.userRoleId}})
+        const passenger = await Passenger.findOne({where: {passport: user.passengerPassport}})
+        const tickets = await Ticket.findAll({where: {passengerPassport: user.passengerPassport}})
+        const token = genToken(user.login, role.role, passenger?.passport, passenger?.fio, tickets)
         return res.json({token})
     }
 

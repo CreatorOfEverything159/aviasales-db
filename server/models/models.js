@@ -38,7 +38,10 @@ const Passenger = sequelize.define('passenger', {
         unique: true,
         allowNull: false
     },
-    fio: {type: DataTypes.STRING, allowNull: false}
+    fio: {
+        type: DataTypes.STRING,
+        allowNull: false
+    }
 }, {
     timestamps: false
 })
@@ -93,8 +96,11 @@ const Ticket = sequelize.define('ticket', {}, { timestamps: false })
 UserRole.hasMany(User)
 User.belongsTo(UserRole)
 
-AirportCity.hasMany(Flight)
-Flight.belongsTo(AirportCity)
+Passenger.hasOne(User)
+User.belongsTo(Passenger)
+
+// AirportCity.hasMany(Flight)
+// Flight.belongsTo(AirportCity)
 
 Flight.belongsToMany(Passenger, {through: Ticket})
 Passenger.belongsToMany(Flight, {through: Ticket})
