@@ -37,7 +37,7 @@ class UserController {
     }
 
     async check(req, res, next) {
-        const token = genToken(req.user.login, req.user.userRoleId)
+        const token = genToken(req.user.login, req.user.userRole, req.passenger?.passport, req.passenger?.fio, req.tickets)
         return res.json({token})
     }
 

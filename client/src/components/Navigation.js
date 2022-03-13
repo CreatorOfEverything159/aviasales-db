@@ -1,47 +1,65 @@
 import React from 'react'
 import {Button, Container, Nav, Navbar, NavLink} from 'react-bootstrap'
-import {FLIGHTS_ROUTE, LOGIN_ROUTE} from "../utils/consts";
+import {ADMIN_ROUTE, FLIGHTS_ROUTE, LOGIN_ROUTE, OPERATOR_ROUTE, PASSENGER_ROUTE} from "../utils/consts";
 import {useLocation, useNavigate} from 'react-router-dom'
+import {useDispatch, useSelector} from 'react-redux'
+import {removeUser} from '../store/actions/user'
 
 const Navigation = () => {
 
-    const click = () => {
-        // if (user.typeId === 1) {
-        //     navigate(ADMIN_ROUTE)
-        // } else if (user.typeId === 2) {
-        //     navigate(MANAGER_ROUTE)
-        // } else if (user.typeId === 3) {
-        //     navigate(SALESMAN_ROUTE)
-        // } else if (user.typeId === 4) {
-        //     navigate(SUBSCRIBER_ROUTE)
-        // }
-    }
-
     const navigate = useNavigate()
     const location = useLocation()
+    const dispatch = useDispatch()
+    const stateUser = useSelector(state => state.userReducer)
+
+    const removeLogoutUser = (user) => {
+        dispatch(removeUser(user))
+    }
+
+    const click = () => {
+        if (stateUser.userRole === 'Администратор') {
+            navigate(ADMIN_ROUTE)
+        } else if (stateUser.userRole === 'Оператор') {
+            navigate(OPERATOR_ROUTE)
+        } else if (stateUser.userRole === 'Пассажир') {
+            navigate(PASSENGER_ROUTE)
+        }
+    }
+
+    const logOut = () => {
+        removeLogoutUser({
+            auth: false,
+            login: null,
+            userRole: null,
+            passengerPassport: null,
+            fio: null,
+            tickets: []
+        })
+        navigate(FLIGHTS_ROUTE)
+    }
 
     const authButton = () => {
-        // if (user.isAuth) {
-        //     if (![ADMIN_ROUTE, MANAGER_ROUTE, SALESMAN_ROUTE, SUBSCRIBER_ROUTE].includes(location.pathname)) {
-        //         return (
-        //             <Nav>
-        //                 <Button
-        //                     variant="outline-primary"
-        //                     className="me-2"
-        //                     onClick={click}
-        //                 >Личный кабинет</Button>
-        //             </Nav>
-        //         )
-        //     } else {
-        //         return (
-        //             <Button
-        //                 variant="outline-danger"
-        //                 className="me-2"
-        //                 onClick={logOut}
-        //             >Выйти</Button>
-        //         )
-        //     }
-        // } else if (location.pathname !== LOGIN_ROUTE) {
+        if (stateUser.auth) {
+            if (![ADMIN_ROUTE, OPERATOR_ROUTE, PASSENGER_ROUTE].includes(location.pathname)) {
+                return (
+                    <Nav>
+                        <Button
+                            variant="outline-primary"
+                            className="me-2"
+                            onClick={click}
+                        >Личный кабинет</Button>
+                    </Nav>
+                )
+            } else {
+                return (
+                    <Button
+                        variant="outline-danger"
+                        className="me-2"
+                        onClick={logOut}
+                    >Выйти</Button>
+                )
+            }
+        } else if (location.pathname !== LOGIN_ROUTE) {
             return (
                 <Nav>
                     <Button
@@ -52,7 +70,7 @@ const Navigation = () => {
                         }}
                     >Авторизация</Button>
                 </Nav>)
-        // }
+        }
     }
 
     return (

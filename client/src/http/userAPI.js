@@ -9,5 +9,12 @@ export const authorization = async (login, password) => {
 
 export const registration = async (login, password, userRole = 'Пассажир', fio, passport) => {
     const {data} = await $host.post('api/user/reg', {login, password, userRole, fio, passport})
-    return data
+    localStorage.setItem('token', data.token)
+    return jwtDecode(data.token)
+}
+
+export const check = async () => {
+    const {data} = await $authHost.get('api/user/check')
+    localStorage.setItem('token', data.token)
+    return jwtDecode(data.token)
 }

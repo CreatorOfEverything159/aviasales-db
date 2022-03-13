@@ -3,7 +3,7 @@ import {Button, Card, Container, Form, NavLink, Row} from 'react-bootstrap'
 import {useLocation, useNavigate} from 'react-router-dom'
 import {authorization, registration} from '../http/userAPI'
 import {useDispatch, useSelector} from 'react-redux'
-import {removeUser, setUser} from '../store/actions/user'
+import {setUser} from '../store/actions/user'
 import {ADMIN_ROUTE, LOGIN_ROUTE, OPERATOR_ROUTE, PASSENGER_ROUTE, REGISTRATION_ROUTE} from '../utils/consts'
 
 const Auth = () => {
@@ -18,10 +18,6 @@ const Auth = () => {
 
     const setLoginUser = (user) => {
         dispatch(setUser(user))
-    }
-
-    const removeLogoutUser = (user) => {
-        dispatch(removeUser(user))
     }
 
     const stateUser = useSelector(state => state.userReducer)
