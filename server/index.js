@@ -4,7 +4,7 @@ const sequelize = require('./db')
 const models = require('./models/models')
 const router = require('./routes')
 const cors = require('cors')
-const {UserRole, User, Flight, AirportCity, Passenger} = require('./models/models')
+const {UserRole, User, Flight, AirportCity, Passenger, Ticket} = require('./models/models')
 // const router = require('./routes/indexRouter')
 // const errorHandler = require('./middleware/ErrorHandlingMiddleware')
 
@@ -39,12 +39,14 @@ const start = async () => {
         await AirportCity.create({airport: 'SVO', city: 'Москва'})
         await AirportCity.create({airport: 'AER', city: 'Сочи'})
         await AirportCity.create({airport: 'LED', city: 'Санкт-Петербург'})
+        await AirportCity.create({airport: 'OGZ', city: 'Владикавказ'})
 
         // get airport-cities
         const VVO = await AirportCity.findOne({where: {airport: 'VVO'}})
         const SVO = await AirportCity.findOne({where: {airport: 'SVO'}})
         const AER = await AirportCity.findOne({where: {airport: 'AER'}})
         const LED = await AirportCity.findOne({where: {airport: 'LED'}})
+        const OGZ = await AirportCity.findOne({where: {airport: 'OGZ'}})
 
         // create flights
         await Flight.create({
@@ -58,6 +60,20 @@ const start = async () => {
             number: 'SU1235',
             departureDate: new Date(2022, 5, 8, 18, 30),
             departureAirport: SVO.airport,
+            destinationAirport: VVO.airport,
+            seatsAmount: 100
+        })
+        await Flight.create({
+            number: 'SU6666',
+            departureDate: new Date(2022, 4, 8, 17, 20),
+            departureAirport: VVO.airport,
+            destinationAirport: OGZ.airport,
+            seatsAmount: 100
+        })
+        await Flight.create({
+            number: 'SU6667',
+            departureDate: new Date(2022, 4, 9, 0, 0),
+            departureAirport: OGZ.airport,
             destinationAirport: VVO.airport,
             seatsAmount: 100
         })
@@ -86,6 +102,9 @@ const start = async () => {
         await User.create({login: 'admin', password: '12345', userRoleId: adminRole.id})
         await User.create({login: 'operator', password: '12345', userRoleId: operatorRole.id})
         await User.create({login: 'passenger', password: '12345', userRoleId: passengerRole.id, passengerPassport: '0521832145'})
+
+        // add tickets
+        await Ticket.create({flightId: 4, passengerPassport: '0521832145'})
 
         app.listen(PORT, () => console.log(`Server started on http://localhost:${PORT}`))
     } catch (e) {

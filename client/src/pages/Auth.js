@@ -26,6 +26,7 @@ const Auth = () => {
         try {
             const data = await authorization(login, password)
             setLoginUser({auth: true, ...data})
+            console.log(data)
             const userRole = data.userRole
             if (userRole === 'Администратор') {
                 navigate(ADMIN_ROUTE)

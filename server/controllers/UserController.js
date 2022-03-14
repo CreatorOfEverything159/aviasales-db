@@ -2,7 +2,13 @@ const {User, UserRole, Passenger, Ticket} = require('../models/models')
 const jwt = require('jsonwebtoken')
 
 const genToken = (login, userRole, passengerPassport, fio, tickets) => {
-    return jwt.sign({login, userRole, passengerPassport, fio, tickets}, process.env.SECRET_KEY, {expiresIn: '6h'})
+    return jwt.sign({
+        login,
+        userRole,
+        passengerPassport,
+        fio,
+        tickets
+    }, process.env.SECRET_KEY, {expiresIn: '6h'})
 }
 
 class UserController {
@@ -37,7 +43,13 @@ class UserController {
     }
 
     async check(req, res, next) {
-        const token = genToken(req.user.login, req.user.userRole, req.passenger?.passport, req.passenger?.fio, req.tickets)
+        const token = genToken(
+            req.user.login,
+            req.user.userRole,
+            req.user.passengerPassport,
+            req.user.fio,
+            req.user.tickets
+        )
         return res.json({token})
     }
 

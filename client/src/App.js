@@ -1,6 +1,6 @@
-import {BrowserRouter} from "react-router-dom";
-import Navigation from "./components/Navigation";
-import AppRouter from "./components/AppRouter";
+import {BrowserRouter} from 'react-router-dom'
+import Navigation from './components/Navigation'
+import AppRouter from './components/AppRouter'
 import {useEffect, useState} from 'react'
 import {check} from './http/userAPI'
 import {setUser} from './store/actions/user'
@@ -14,7 +14,6 @@ function App() {
     useEffect(() => {
         check()
             .then(data => {
-                console.log(data)
                 dispatch(setUser({auth: true, ...data}))
             })
             .finally(() => setLoading(false))

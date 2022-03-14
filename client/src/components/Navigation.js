@@ -6,7 +6,6 @@ import {useDispatch, useSelector} from 'react-redux'
 import {removeUser} from '../store/actions/user'
 
 const Navigation = () => {
-
     const navigate = useNavigate()
     const location = useLocation()
     const dispatch = useDispatch()
