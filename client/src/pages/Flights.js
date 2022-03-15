@@ -3,6 +3,8 @@ import {Button, Col, Container, Form, Row, Table} from 'react-bootstrap'
 import {getAllFlights, searchFlights} from '../http/flightsAPI'
 import {useDispatch, useSelector} from 'react-redux'
 import {addAllFlights} from '../store/actions/flights'
+import {ticketAdder, ticketRemover} from '../http/ticAPIkets'
+import {setUser} from '../store/actions/user'
 
 const Flights = () => {
     const dispatch = useDispatch()
@@ -35,6 +37,22 @@ const Flights = () => {
         minute: "numeric"
     })
 
+    const addTicket = (flightId) => {
+        ticketAdder(flightId, stateUser.passengerPassport)
+            .then(data => {
+                stateUser.tickets.push(data)
+                dispatch(setUser({tickets: [...stateUser.tickets]}))
+            })
+    }
+
+    const removeTicket = (flightId) => {
+        ticketRemover(flightId, stateUser.passengerPassport)
+            .then(data => {
+                stateUser.tickets.splice(stateUser.tickets.findIndex(ticket => ticket.flightId === flightId), 1)
+                dispatch(setUser({tickets: [...stateUser.tickets]}))
+            })
+    }
+
     const setBtn = (flight) => {
         const flightsIds = stateUser.tickets.map(({flightId}) => flightId)
         console.log(stateUser)
@@ -42,9 +60,13 @@ const Flights = () => {
         if (stateUser.auth) {
             if (stateUser.userRole === 'Пассажир') {
                 if (flightsIds.includes(flight.id)) {
-                    return <Button variant="danger">Отменить бронь</Button>
+                    return <Button
+                        onClick={() => {removeTicket(flight.id)}}
+                        variant="danger">Отменить бронь</Button>
                 }
-                return <Button variant="warning">Забронировать</Button>
+                return <Button
+                    onClick={() => {addTicket(flight.id)}}
+                    variant="warning">Забронировать</Button>
             } else {
                 return <Button disabled variant="warning">Забронировать</Button>
             }

@@ -2,6 +2,7 @@ const Router = require('express')
 const router = new Router()
 const ticketController = require('../controllers/TicketController')
 
-router.get('/', ticketController.getAll)
+router.post('/add', ticketController.addTicket)
+router.post('/remove', ticketController.removeTicket)
 
 module.exports = router
