@@ -104,7 +104,7 @@ const start = async () => {
         await User.create({login: 'passenger', password: '12345', userRoleId: passengerRole.id, passengerPassport: '0521832145'})
 
         // add tickets
-        await Ticket.create({flightId: 4, passengerPassport: '0521832145'})
+        // await Ticket.create({flightId: 4, passengerPassport: '0521832145'})
 
         app.listen(PORT, () => console.log(`Server started on http://localhost:${PORT}`))
     } catch (e) {

@@ -45,7 +45,6 @@ class UserController {
     async check(req, res, next) {
         const {user} = req
         const tickets = await Ticket.findAll({where: {passengerPassport: user.passengerPassport}})
-        // const token = genToken(user.login, role.role, passenger?.passport, passenger?.fio, tickets)
         const token = genToken(
             req.user.login,
             req.user.userRole,

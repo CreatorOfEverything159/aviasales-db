@@ -2,7 +2,6 @@ import React, {useEffect, useState} from 'react'
 import {Button, Col, Container, Form, Row, Table} from 'react-bootstrap'
 import {getAllFlights, searchFlights} from '../http/flightsAPI'
 import {useDispatch, useSelector} from 'react-redux'
-import {addAllFlights} from '../store/actions/flights'
 import {ticketAdder, ticketRemover} from '../http/ticAPIkets'
 import {setUser} from '../store/actions/user'
 
@@ -12,19 +11,12 @@ const Flights = () => {
     const [searchDepartureCity, setSearchDepartureCity] = useState('')
     const [searchDestinationCity, setSearchDestinationCity] = useState('')
     const [searchDepartureDate, setSearchDepartureDate] = useState(new Date().toISOString().slice(0, 10))
-
-    // const addFlights = (flights) => {
-    //     dispatch(addAllFlights(flights))
-    // }
-
-    // const stateFlights = useSelector(state => state.flightReducer)
     const stateUser = useSelector(state => state.userReducer)
 
     useEffect(() => {
         getAllFlights()
             .then(data => {
                 setFlights(data)
-                // addFlights(data)
             })
     }, [])
 
@@ -55,8 +47,6 @@ const Flights = () => {
 
     const setBtn = (flight) => {
         const flightsIds = stateUser.tickets.map(({flightId}) => flightId)
-        console.log(stateUser)
-        console.log(flightsIds, flight.id)
         if (stateUser.auth) {
             if (stateUser.userRole === 'Пассажир') {
                 if (flightsIds.includes(flight.id)) {
@@ -82,7 +72,6 @@ const Flights = () => {
             .then(data => {
                 setFlights(data)
             })
-
     }
 
     return (
@@ -150,7 +139,9 @@ const Flights = () => {
                     </thead>
                     <tbody>
                     {
-                        flights.map(flight => {
+                        flights.length !== 0
+                        ? flights.map(flight => {
+                            if (!stateUser.tickets.find(ticket => ticket.flightId === flight.id))
                                 return (
                                     <tr key={flight.id}>
                                         <td>{flight.number}</td>
@@ -169,6 +160,7 @@ const Flights = () => {
                                 )
                             }
                         )
+                            : 'Нет рейсов'
                     }
                     </tbody>
                 </Table>

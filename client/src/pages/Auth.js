@@ -20,13 +20,12 @@ const Auth = () => {
         dispatch(setUser(user))
     }
 
-    const stateUser = useSelector(state => state.userReducer)
+    // const stateUser = useSelector(state => state.userReducer)
 
     const authorize = async () => {
         try {
             const data = await authorization(login, password)
             setLoginUser({auth: true, ...data})
-            console.log(data)
             const userRole = data.userRole
             if (userRole === 'Администратор') {
                 navigate(ADMIN_ROUTE)
