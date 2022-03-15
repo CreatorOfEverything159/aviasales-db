@@ -13,18 +13,18 @@ const Flights = () => {
     const [searchDestinationCity, setSearchDestinationCity] = useState('')
     const [searchDepartureDate, setSearchDepartureDate] = useState(new Date().toISOString().slice(0, 10))
 
-    const addFlights = (flights) => {
-        dispatch(addAllFlights(flights))
-    }
+    // const addFlights = (flights) => {
+    //     dispatch(addAllFlights(flights))
+    // }
 
-    const stateFlights = useSelector(state => state.flightReducer)
+    // const stateFlights = useSelector(state => state.flightReducer)
     const stateUser = useSelector(state => state.userReducer)
 
     useEffect(() => {
         getAllFlights()
             .then(data => {
                 setFlights(data)
-                addFlights(data)
+                // addFlights(data)
             })
     }, [])
 
