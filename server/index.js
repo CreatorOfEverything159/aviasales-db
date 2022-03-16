@@ -5,8 +5,7 @@ const models = require('./models/models')
 const router = require('./routes')
 const cors = require('cors')
 const {UserRole, User, Flight, AirportCity, Passenger, Ticket} = require('./models/models')
-// const router = require('./routes/indexRouter')
-// const errorHandler = require('./middleware/ErrorHandlingMiddleware')
+const statusHandler = require('./middleware/StatusHandligMiddleware')
 
 const PORT = process.env.PORT || 5000
 
@@ -17,7 +16,7 @@ app.use(express.json())
 app.use('/api', router)
 
 // Errors, last Middleware
-// app.use(errorHandler) TODO добавить хендлер
+app.use(statusHandler)
 
 const start = async () => {
     try {

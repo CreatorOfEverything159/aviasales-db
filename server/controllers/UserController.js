@@ -1,6 +1,7 @@
 const {User, UserRole, Passenger, Ticket} = require('../models/models')
 const jwt = require('jsonwebtoken')
 const { Op } = require('@sequelize/core')
+const ApiStatus = require('../status/ApiStatus')
 
 const genToken = (login, userRole, passengerPassport = null, fio = null, tickets = []) => {
     return jwt.sign({
@@ -86,9 +87,9 @@ class UserController {
     async regUser(req, res, next) {
         const {login, password, userRole} = req.body
         const role = await UserRole.findOne({where: {role: userRole}})
-        let user = await User.findOne({where: {login}})
+        const user = await User.findOne({where: {login}})
         if (user) {
-            return next() // TODO Error
+            return next(ApiStatus.badRequest('Такой пользователь уже существует')) // TODO Error
         }
         await User.create({login, password, userRoleId: role.id})
         return res.json({message: `Пользователь ${login} успешно создан!`})

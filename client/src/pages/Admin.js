@@ -24,10 +24,12 @@ const Admin = () => {
 
     const operatorReg = async () => {
         try {
-            userRegistration(login, password, 'Оператор')
-                .then(data => alert(data.message))
-            getUsers('Оператор')
-                .then(data => setOperators(data))
+            const data = await userRegistration(login, password, 'Оператор')
+            alert(data.message)
+                // .then(data => alert(data.message))
+            const users = await getUsers('Оператор')
+            setOperators(users)
+                // .then(data => setOperators(data))
         } catch (e) {
             alert(e.response.data.message)
         }
