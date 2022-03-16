@@ -9,5 +9,6 @@ router.post('/reg',  userController.registration)
 router.post('/users',  userController.getUsers)
 router.post('/remove',  userController.removeUsers)
 router.post('/user',  userController.getUser)
+router.post('/search',  userController.searchUser)
 
 module.exports = router

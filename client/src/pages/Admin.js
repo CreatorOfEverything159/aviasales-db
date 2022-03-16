@@ -35,7 +35,8 @@ const Admin = () => {
 
     const searchOperator = async (findLogin, findType) => {
         try {
-            return await searchUser(findLogin, findType)
+            searchUser(findLogin, findType)
+                .then(data => setOperators(data))
         } catch (e) {
             alert(e.response.data.message)
         }
@@ -127,7 +128,6 @@ const Admin = () => {
                             <Form.Control value={findLogin} type="text" placeholder="Найти" onChange={(e) => {
                                 setFindLogin(e.target.value)
                                 searchOperator(e.target.value, 'Оператор')
-                                    .then(data => setOperators(data))
                             }}/>
                         </Form.Group>
                     </Col>
