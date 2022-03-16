@@ -83,6 +83,17 @@ class UserController {
         return res.json(user)
     }
 
+    async regUser(req, res, next) {
+        const {login, password, userRole} = req.body
+        const role = await UserRole.findOne({where: {role: userRole}})
+        let user = await User.findOne({where: {login}})
+        if (user) {
+            return next() // TODO Error
+        }
+        await User.create({login, password, userRoleId: role.id})
+        return res.json({message: `Пользователь ${login} успешно создан!`})
+    }
+
     async removeUsers(req, res, next) {
         const {login, role} = req.body
         const userRole = await UserRole.findOne({where: {role}})

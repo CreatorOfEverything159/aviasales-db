@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react'
 import {Button, Col, Container, Form, Table} from "react-bootstrap";
-import {getUser, getUsers, registration, removeUser, searchUser} from "../http/userAPI";
+import {getUser, getUsers, removeUser, searchUser, userRegistration} from "../http/userAPI";
 
 const Admin = () => {
 
@@ -24,8 +24,8 @@ const Admin = () => {
 
     const operatorReg = async () => {
         try {
-            const data = await registration(login, password, 'Оператор')
-            alert(data.message)
+            userRegistration(login, password, 'Оператор')
+                .then(data => alert(data.message))
             getUsers('Оператор')
                 .then(data => setOperators(data))
         } catch (e) {
@@ -70,21 +70,6 @@ const Admin = () => {
             <Container>
                 <h2 className="mt-4">Создать пользователя</h2>
                 <Form className="">
-                    <Col md={5} style={{padding: '5px'}}>
-                        <Form.Group controlId="formRegistrationType">
-                            <Form.Text className="text-muted">
-                                Должность пользователя
-                            </Form.Text>
-                            <Form.Select
-                                aria-label="Default select example"
-                                value={userType}
-                                onChange={e => setUserType(e.target.value)}
-                            >
-                                <option value="2">Менеджер</option>
-                                <option value="3">Продавец-консультант</option>
-                            </Form.Select>
-                        </Form.Group>
-                    </Col>
                     <Col md={5} style={{padding: '5px'}}>
                         <Form.Group controlId="formRegistrationLogin">
                             <Form.Text className="text-muted">

@@ -35,6 +35,21 @@ export const registration = async (
     return jwtDecode(data.token)
 }
 
+export const userRegistration = async (
+    login,
+    password,
+    userRole
+) => {
+    const {data} = await $host.post(
+        'api/user/reg-user',
+        {
+            login,
+            password,
+            userRole
+        })
+    return data
+}
+
 export const check = async () => {
     const {data} = await $authHost.get('api/user/check')
     localStorage.setItem('token', data.token)
