@@ -51,11 +51,15 @@ const Flights = () => {
             if (stateUser.userRole === 'Пассажир') {
                 if (flightsIds.includes(flight.id)) {
                     return <Button
-                        onClick={() => {removeTicket(flight.id)}}
+                        onClick={() => {
+                            removeTicket(flight.id)
+                        }}
                         variant="danger">Отменить бронь</Button>
                 }
                 return <Button
-                    onClick={() => {addTicket(flight.id)}}
+                    onClick={() => {
+                        addTicket(flight.id)
+                    }}
                     variant="warning">Забронировать</Button>
             } else {
                 return <Button disabled variant="warning">Забронировать</Button>
@@ -125,45 +129,47 @@ const Flights = () => {
             </Container>
             <Container>
                 <h1 className="mt-4">Рейсы</h1>
-                <Table className="mt-4">
-                    <thead>
-                    <tr>
-                        <th>Номер рейса</th>
-                        <th>Город вылета</th>
-                        <th>Город назначения</th>
-                        <th>Аэропорт вылета</th>
-                        <th>Аэропорт назначения</th>
-                        <th>Дата и время вылета</th>
-                        <th>Количество мест</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {
-                        flights.length !== 0
-                        ? flights.map(flight => {
-                            if (!stateUser.tickets.find(ticket => ticket.flightId === flight.id))
-                                return (
-                                    <tr key={flight.id}>
-                                        <td>{flight.number}</td>
-                                        <td>{flight.departureCity}</td>
-                                        <td>{flight.destinationCity}</td>
-                                        <td>{flight.departureAirport}</td>
-                                        <td>{flight.destinationAirport}</td>
-                                        <td>{formatter.format(new Date(flight.departureDate))}</td>
-                                        <td>{flight.seatsAmount}</td>
-                                        <td>
-                                            {
-                                                setBtn(flight)
-                                            }
-                                        </td>
-                                    </tr>
+                {
+                    flights.length !== 0
+                        ? <Table className="mt-4">
+                            <thead>
+                            <tr>
+                                <th>Номер рейса</th>
+                                <th>Город вылета</th>
+                                <th>Город назначения</th>
+                                <th>Аэропорт вылета</th>
+                                <th>Аэропорт назначения</th>
+                                <th>Дата и время вылета</th>
+                                <th>Количество мест</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {
+                                flights.map(flight => {
+                                        return (
+                                            <tr key={flight.id}>
+                                                <td>{flight.number}</td>
+                                                <td>{flight.departureCity}</td>
+                                                <td>{flight.destinationCity}</td>
+                                                <td>{flight.departureAirport}</td>
+                                                <td>{flight.destinationAirport}</td>
+                                                <td>{formatter.format(new Date(flight.departureDate))}</td>
+                                                <td>{flight.seatsAmount}</td>
+                                                <td>
+                                                    {
+                                                        setBtn(flight)
+                                                    }
+                                                </td>
+                                            </tr>
+                                        )
+                                    }
                                 )
                             }
-                        )
-                            : 'Нет рейсов'
-                    }
-                    </tbody>
-                </Table>
+                            </tbody>
+                        </Table>
+                        : 'Рейсов нет'
+                }
+
             </Container>
         </>
     )
