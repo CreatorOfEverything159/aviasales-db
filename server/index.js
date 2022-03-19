@@ -53,42 +53,48 @@ const start = async () => {
             departureDate: new Date(2022, 5, 6, 7, 30),
             departureAirport: VVO.airport,
             destinationAirport: SVO.airport,
-            seatsAmount: 100
+            seatsAmount: 100,
+            isActive: true
         })
         await Flight.create({
             number: 'SU1235',
             departureDate: new Date(2022, 5, 8, 18, 30),
             departureAirport: SVO.airport,
             destinationAirport: VVO.airport,
-            seatsAmount: 100
+            seatsAmount: 100,
+            isActive: true
         })
         await Flight.create({
             number: 'SU6666',
             departureDate: new Date(2022, 4, 8, 17, 20),
             departureAirport: VVO.airport,
             destinationAirport: OGZ.airport,
-            seatsAmount: 100
+            seatsAmount: 100,
+            isActive: true
         })
         await Flight.create({
             number: 'SU6667',
             departureDate: new Date(2022, 4, 9, 0, 0),
             departureAirport: OGZ.airport,
             destinationAirport: VVO.airport,
-            seatsAmount: 100
+            seatsAmount: 100,
+            isActive: true
         })
         await Flight.create({
             number: 'SU9090',
             departureDate: new Date(2022, 5, 7, 12, 45),
             departureAirport: AER.airport,
             destinationAirport: LED.airport,
-            seatsAmount: 50
+            seatsAmount: 50,
+            isActive: true
         })
         await Flight.create({
             number: 'SU9091',
             departureDate: new Date(2022, 5, 9, 23, 0),
             departureAirport: LED.airport,
             destinationAirport: AER.airport,
-            seatsAmount: 50
+            seatsAmount: 50,
+            isActive: true
         })
 
         // create passengers

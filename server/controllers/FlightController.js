@@ -1,5 +1,6 @@
 const {Flight, AirportCity} = require('../models/models')
 const { Op } = require('@sequelize/core')
+const ApiStatus = require('../status/ApiStatus')
 
 class FlightController {
 
@@ -60,6 +61,16 @@ class FlightController {
             flight.dataValues.destinationCity = await getCity(flight.destinationAirport)
         }
         return res.json(flights)
+    }
+
+    async cancel(req, res, next) {
+        const {id} = req.body
+        const flight = await Flight.findOne({where: {id}})
+        if (!flight) {
+            return next(ApiStatus.badRequest('Такого рейса не существует'))
+        }
+        await Flight.update({isAuth: false}, {where: {id}})
+        return res.json({message: 'Рейс отменен'})
     }
 
 }

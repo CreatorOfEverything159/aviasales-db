@@ -10,3 +10,8 @@ export const searchFlights = async (departureCity, destinationCity, departureDat
     const {data} = await $authHost.post('api/flight/search', {departureCity, destinationCity, departureDate})
     return data
 }
+
+export const cancelFlight = async (id) => {
+    const {data} = await $authHost.post('api/flight/cancel', {id})
+    return data
+}

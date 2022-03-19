@@ -1,20 +1,17 @@
 import React, {useEffect, useState} from 'react'
-import {Button, Col, Container, Form, Table} from "react-bootstrap";
-import {getUser, getUsers, removeUser, searchUser, userRegistration} from "../http/userAPI";
+import {Button, Col, Container, Form, Modal, Table} from 'react-bootstrap'
+import {getUser, getUsers, removeUser, searchUser, userRegistration} from '../http/userAPI'
+import {useDispatch, useSelector} from 'react-redux'
+import {setUser} from '../store/actions/user'
 
 const Admin = () => {
-
-    // const {user} = useContext(Context)
+    const dispatch = useDispatch()
+    const stateUser = useSelector(state => state.userReducer)
     const [login, setLogin] = useState('')
     const [password, setPassword] = useState('')
-    const [userType, setUserType] = useState(2)
-
     const [findLogin, setFindLogin] = useState('')
-    const [findType, setFindType] = useState('')
-
     const [modalShow, setModalShow] = useState(false)
     const [modalUser, setModalUser] = useState({})
-
     const [operators, setOperators] = useState([])
 
     useEffect(() => {
@@ -26,10 +23,8 @@ const Admin = () => {
         try {
             const data = await userRegistration(login, password, 'Оператор')
             alert(data.message)
-                // .then(data => alert(data.message))
             const users = await getUsers('Оператор')
             setOperators(users)
-                // .then(data => setOperators(data))
         } catch (e) {
             alert(e.response.data.message)
         }
@@ -46,10 +41,10 @@ const Admin = () => {
 
     const removeOperator = async (login) => {
         try {
-            removeUser(login, 'Оператор')
-                .then(data => alert(data.message))
-            getUsers('Оператор')
-                .then(data => setOperators(data))
+            const data = await removeUser(login, 'Оператор')
+            alert(data.message)
+            const operators = await getUsers('Оператор')
+            setOperators(operators)
         } catch (e) {
             alert(e.response.data.message)
         }
@@ -63,6 +58,61 @@ const Admin = () => {
         }
     }
 
+    const ModalOperator = props => {
+        const [login, setLogin] = useState(props.user.login)
+        const [password, setPassword] = useState(props.user.password)
+
+        const change = async () => {
+            // try {
+            //     await changeUser(props.user.login, login, password, userTypeId)
+            //     getAllManagerAndSalesman()
+            //         .then(data => user.setDownloadedUsers(data))
+            // } catch (e) {
+            //     alert(e.response.data.message)
+            // }
+        }
+
+        return (
+            <Modal {...props} size="lg" aria-labelledby="contained-modal-title-vcenter" centered>
+                <Modal.Header closeButton>
+                    <Modal.Title id="contained-modal-title-vcenter">
+                        Изменение данных оператора
+                    </Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <Form className="">
+                        <Col md={5} style={{padding: '5px'}}>
+                            <Form.Group controlId="formRegistrationLogin">
+                                <Form.Text className="text-muted">
+                                    Логин пользователя
+                                </Form.Text>
+                                <Form.Control type="text" value={login}
+                                              onChange={(e) => setLogin(e.target.value)} placeholder="Логин"/>
+                            </Form.Group>
+                        </Col>
+                        <Col md={5} style={{padding: '5px'}}>
+                            <Form.Group controlId="formRegistrationPassword">
+                                <Form.Text className="text-muted">
+                                    Пароль пользователя
+                                </Form.Text>
+                                <Form.Control value={password} onChange={(e) => {
+                                    setPassword(e.target.value)
+                                }} type="text" placeholder="Пароль"/>
+                            </Form.Group>
+                        </Col>
+                    </Form>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button onClick={() => {
+                        change().then(data => {
+                            props.onHide()
+                        })
+                    }}>Сохранить изменения</Button>
+                </Modal.Footer>
+            </Modal>
+        )
+    }
+
     return (
         <>
             <Container style={{marginTop: 30}}>
@@ -70,7 +120,7 @@ const Admin = () => {
                 <hr/>
             </Container>
             <Container>
-                <h2 className="mt-4">Создать пользователя</h2>
+                <h2 className="mt-4">Создать оператора</h2>
                 <Form className="">
                     <Col md={5} style={{padding: '5px'}}>
                         <Form.Group controlId="formRegistrationLogin">
@@ -127,7 +177,6 @@ const Admin = () => {
                     <tr>
                         <th>№</th>
                         <th>Логин</th>
-                        <th>Должность</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -138,13 +187,10 @@ const Admin = () => {
                                         <td>{index + 1}</td>
                                         <td>{operator.login}</td>
                                         <td>
-                                            <Button className="me-4" variant="outline-warning" onClick={() => {
-                                                getOneUser(operator.login)
-                                                    .then(data => {
-                                                    setModalUser(data)
-                                                    setModalShow(true)
-                                                })
-                                            }}>Изменить</Button>
+                                            {/*<Button className="me-4" variant="outline-warning" onClick={() => {*/}
+                                            {/*    setModalUser(operator)*/}
+                                            {/*    setModalShow(true)*/}
+                                            {/*}}>Изменить</Button>*/}
                                             <Button variant="outline-danger" onClick={() => {
                                                 removeOperator(operator.login)
                                             }}>Удалить</Button>
@@ -157,7 +203,7 @@ const Admin = () => {
                     </tbody>
                 </Table>
             </Container>
-            {/*<MyVerticallyCenteredModal user={modalUser} show={modalShow} onHide={() => setModalShow(false)} />*/}
+            <ModalOperator user={modalUser} show={modalShow} onHide={() => setModalShow(false)}/>
         </>
     )
 }

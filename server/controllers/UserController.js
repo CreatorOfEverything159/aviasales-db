@@ -1,6 +1,6 @@
 const {User, UserRole, Passenger, Ticket} = require('../models/models')
 const jwt = require('jsonwebtoken')
-const { Op } = require('@sequelize/core')
+const {Op} = require('@sequelize/core')
 const ApiStatus = require('../status/ApiStatus')
 
 const genToken = (login, userRole, passengerPassport = null, fio = null, tickets = []) => {
@@ -19,11 +19,11 @@ class UserController {
         const {login, password, userRole, fio, passport} = req.body
         let user = await User.findOne({where: {login}})
         if (user) {
-            return next() // TODO Error
+            return next(ApiStatus.badRequest(`Логин ${login} занят`)) // TODO Error
         }
         let passenger = await Passenger.findOne({where: {passport}})
         if (passenger) {
-            return next() // TODO Error
+            return next(ApiStatus.badRequest(`Пользователь с такими серией и номером паспорта уже существует`)) // TODO Error
         }
         const role = await UserRole.findOne({where: {role: userRole}})
         await Passenger.create({passport, fio})
@@ -35,7 +35,7 @@ class UserController {
         const {login, password} = req.body
         const user = await User.findOne({where: {login, password}})
         if (!user) {
-            return next() // TODO Error
+            return next(ApiStatus.badRequest(`Пользователь ${login} не найден`)) // TODO Error
         }
         const role = await UserRole.findOne({where: {id: user.userRoleId}})
         const passenger = await Passenger.findOne({where: {passport: user.passengerPassport}})
@@ -68,9 +68,6 @@ class UserController {
     async getUsers(req, res, next) {
         const {role} = req.body
         const userRole = await UserRole.findOne({where: {role}})
-        if (!userRole) {
-            return next() // TODO Error
-        }
         const users = await User.findAll({where: {userRoleId: userRole.id}})
         return res.json(users)
     }
@@ -79,7 +76,7 @@ class UserController {
         const {login} = req.body
         const user = await User.findOne({where: {login}})
         if (!user) {
-            return next() // TODO Error
+            return next(ApiStatus.badRequest(`Пользователь ${login} не найден`)) // TODO Error
         }
         return res.json(user)
     }
@@ -89,7 +86,7 @@ class UserController {
         const role = await UserRole.findOne({where: {role: userRole}})
         const user = await User.findOne({where: {login}})
         if (user) {
-            return next(ApiStatus.badRequest('Такой пользователь уже существует')) // TODO Error
+            return next(ApiStatus.badRequest(`Пользователь ${login} уже существует`)) // TODO Error
         }
         await User.create({login, password, userRoleId: role.id})
         return res.json({message: `Пользователь ${login} успешно создан!`})
@@ -100,16 +97,16 @@ class UserController {
         const userRole = await UserRole.findOne({where: {role}})
         const user = await User.findOne({where: {login, userRoleId: userRole.id}})
         if (!user) {
-            return next() // TODO Error
+            return next(ApiStatus.badRequest(`Пользователь ${login} не найден`)) // TODO Error
         }
         await user.destroy()
-        return res.json({message: 'Пользователь удален'})
+        return res.json({message: `Пользователь ${login} удален`})
     }
 
     async searchUser(req, res, next) {
         const {login, role} = req.body
         const userRole = await UserRole.findOne({where: {role}})
-        const users = await User.findAll({where: {login: { [Op.substring]: login}, userRoleId: userRole.id}})
+        const users = await User.findAll({where: {login: {[Op.substring]: login}, userRoleId: userRole.id}})
         return res.json(users)
     }
 

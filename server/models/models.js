@@ -86,6 +86,10 @@ const Flight = sequelize.define('flight', {
     seatsAmount: {
         type: DataTypes.INTEGER,
         allowNull: false
+    },
+    isActive: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false
     }
 }, {
     timestamps: false

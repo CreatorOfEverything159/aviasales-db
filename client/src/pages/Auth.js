@@ -41,7 +41,8 @@ const Auth = () => {
 
     const reg = async () => {
         try {
-            await registration(login, password, 'Пассажир', fio, passport)
+            const data = await registration(login, password, 'Пассажир', fio, passport)
+            alert(data.message)
             navigate(LOGIN_ROUTE)
         } catch (e) {
             alert(e.response.data.message)

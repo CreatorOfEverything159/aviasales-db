@@ -30,19 +30,27 @@ const Flights = () => {
     })
 
     const addTicket = (flightId) => {
-        ticketAdder(flightId, stateUser.passengerPassport)
-            .then(data => {
-                stateUser.tickets.push(data)
-                dispatch(setUser({tickets: [...stateUser.tickets]}))
-            })
+        try {
+            ticketAdder(flightId, stateUser.passengerPassport)
+                .then(data => {
+                    stateUser.tickets.push(data)
+                    dispatch(setUser({tickets: [...stateUser.tickets]}))
+                })
+        } catch (e) {
+            alert(e.response.data.message)
+        }
     }
 
     const removeTicket = (flightId) => {
-        ticketRemover(flightId, stateUser.passengerPassport)
-            .then(data => {
-                stateUser.tickets.splice(stateUser.tickets.findIndex(ticket => ticket.flightId === flightId), 1)
-                dispatch(setUser({tickets: [...stateUser.tickets]}))
-            })
+        try {
+            ticketRemover(flightId, stateUser.passengerPassport)
+                .then(data => {
+                    stateUser.tickets.splice(stateUser.tickets.findIndex(ticket => ticket.flightId === flightId), 1)
+                    dispatch(setUser({tickets: [...stateUser.tickets]}))
+                })
+        } catch (e) {
+            alert(e.response.data.message)
+        }
     }
 
     const setBtn = (flight) => {
@@ -70,12 +78,8 @@ const Flights = () => {
     }
 
     const search = () => {
-        searchFlights(searchDepartureCity,
-            searchDestinationCity,
-            searchDepartureDate)
-            .then(data => {
-                setFlights(data)
-            })
+        searchFlights(searchDepartureCity, searchDestinationCity, searchDepartureDate)
+            .then(data => setFlights(data))
     }
 
     return (
@@ -141,6 +145,7 @@ const Flights = () => {
                                 <th>Аэропорт назначения</th>
                                 <th>Дата и время вылета</th>
                                 <th>Количество мест</th>
+                                <th>Статус</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -155,6 +160,7 @@ const Flights = () => {
                                                 <td>{flight.destinationAirport}</td>
                                                 <td>{formatter.format(new Date(flight.departureDate))}</td>
                                                 <td>{flight.seatsAmount}</td>
+                                                <td>{flight.isActive ? 'Ожидается' : 'Отменен'}</td>
                                                 <td>
                                                     {
                                                         setBtn(flight)

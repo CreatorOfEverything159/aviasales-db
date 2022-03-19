@@ -1,4 +1,5 @@
 const {Ticket} = require('../models/models')
+const ApiStatus = require("../status/ApiStatus");
 
 class TicketController {
 
@@ -6,7 +7,7 @@ class TicketController {
         const {flightId, passengerPassport} = req.body
         let ticket = await Ticket.findOne({where: {flightId, passengerPassport}})
         if (ticket) {
-            return next() // TODO Error
+            return next(ApiStatus.badRequest(`Пользователь ${login} не найден`)) // TODO Error
         }
         ticket = await Ticket.create({flightId, passengerPassport})
         return res.json(ticket)
