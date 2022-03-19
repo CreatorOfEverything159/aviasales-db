@@ -71,6 +71,25 @@ class FlightController {
         return res.json(flights)
     }
 
+    async searching(req, res, next) {
+        const {number, departureDate} = req.body
+        let date = new Date(departureDate)
+        let departureDate2 = new Date(departureDate)
+        departureDate2 = new Date(departureDate2.setDate(date.getDate() + 1))
+        const flights = await Flight.findAll({
+            where: {
+                number: {
+                    [Op.substring]: number
+                },
+                departureDate: {
+                    [Op.gte]: date,
+                    [Op.lt]: departureDate2
+                }
+            }
+        })
+        return res.json(flights)
+    }
+
     async cancel(req, res, next) {
         const {id} = req.body
         const flight = await Flight.findOne({where: {id}})

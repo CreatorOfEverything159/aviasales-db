@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react'
-import {cancelFlight, getAllFlights, searchFlights} from "../http/flightsAPI";
+import {cancelFlight, getAllFlights, searchFlightByNumber, searchFlights} from "../http/flightsAPI";
 import {Button, Col, Container, Form, Row, Table} from "react-bootstrap";
 import {ticketAdder, ticketRemover} from "../http/ticketsAPI";
 import {setUser} from "../store/actions/user";
@@ -8,7 +8,7 @@ import {useDispatch, useSelector} from "react-redux";
 const Operator = () => {
     const dispatch = useDispatch()
     const [flights, setFlights] = useState([])
-    const [searchDepartureCity, setSearchDepartureCity] = useState('')
+    const [number, setNumber] = useState('')
     const [searchDestinationCity, setSearchDestinationCity] = useState('')
     const [searchDepartureDate, setSearchDepartureDate] = useState(new Date().toISOString().slice(0, 10))
     const stateUser = useSelector(state => state.userReducer)
@@ -65,7 +65,7 @@ const Operator = () => {
     }
 
     const search = () => {
-        searchFlights(searchDepartureCity, searchDestinationCity, searchDepartureDate)
+        searchFlightByNumber(number, searchDepartureDate)
             .then(data => setFlights(data))
     }
 
@@ -85,8 +85,8 @@ const Operator = () => {
                                     Номер рейса
                                 </Form.Text>
                                 <Form.Control
-                                    value={searchDepartureCity}
-                                    onChange={e => setSearchDepartureCity(e.target.value)}
+                                    value={number}
+                                    onChange={e => setNumber(e.target.value)}
                                     type="text"
                                     placeholder="Номер рейса"/>
                             </Form.Group>
