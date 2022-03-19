@@ -1,4 +1,4 @@
-const {Ticket} = require('../models/models')
+const {Ticket, Flight} = require('../models/models')
 const ApiStatus = require("../status/ApiStatus");
 
 class TicketController {
@@ -9,6 +9,8 @@ class TicketController {
         if (ticket) {
             return next(ApiStatus.badRequest(`Пользователь ${login} не найден`)) // TODO Error
         }
+        const flight = await Flight.findOne({where: {id: flightId}})
+        await Flight.update({seatsAmount: flight.seatsAmount - 1}, {where: {id: flightId}})
         ticket = await Ticket.create({flightId, passengerPassport})
         return res.json(ticket)
     }
@@ -19,6 +21,8 @@ class TicketController {
         if (!ticket) {
             return next() // TODO Error
         }
+        const flight = await Flight.findOne({where: {id: flightId}})
+        await Flight.update({seatsAmount: flight.seatsAmount + 1}, {where: {id: flightId}})
         await ticket.destroy()
         return res.json({message: 'Бронирование отменено'})
     }

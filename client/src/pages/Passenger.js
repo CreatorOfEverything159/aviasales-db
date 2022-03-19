@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react'
 import {useDispatch, useSelector} from 'react-redux'
 import {Button, Container, Table} from 'react-bootstrap'
-import {ticketAdder, ticketRemover} from '../http/ticAPIkets'
+import {ticketAdder, ticketRemover} from '../http/ticketsAPI'
 import {setUser} from '../store/actions/user'
 import {getAllFlights} from '../http/flightsAPI'
 
@@ -46,15 +46,32 @@ const Passenger = () => {
 
     const setBtn = (flight) => {
         const flightsIds = stateUser.tickets.map(({flightId}) => flightId)
+        const dateNow = new Date()
         if (stateUser.auth) {
             if (stateUser.userRole === 'Пассажир') {
-                if (flightsIds.includes(flight.id)) {
+                if (flightsIds.includes(flight.id) && new Date(flight.departureDate) <= dateNow) {
                     return <Button
-                        onClick={() => {removeTicket(flight.id)}}
+                        onClick={() => {
+                            removeTicket(flight.id)
+                        }}
+                        disabled
                         variant="danger">Отменить бронь</Button>
+                } else if (flightsIds.includes(flight.id)) {
+                    return <Button
+                        onClick={() => {
+                            removeTicket(flight.id)
+                        }}
+                        variant="danger">Отменить бронь</Button>
+                } else if (!flightsIds.includes(flight.id) && new Date(flight.departureDate) <= dateNow) {
+                    return <Button disabled variant="warning">Забронировать</Button>
+                }
+                if (!flight.isActive) {
+                    return <Button disabled variant="warning">Забронировать</Button>
                 }
                 return <Button
-                    onClick={() => {addTicket(flight.id)}}
+                    onClick={() => {
+                        addTicket(flight.id)
+                    }}
                     variant="warning">Забронировать</Button>
             } else {
                 return <Button disabled variant="warning">Забронировать</Button>

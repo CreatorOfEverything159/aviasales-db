@@ -2,7 +2,7 @@ import React, {useState} from 'react'
 import {Button, Card, Container, Form, NavLink, Row} from 'react-bootstrap'
 import {useLocation, useNavigate} from 'react-router-dom'
 import {authorization, registration} from '../http/userAPI'
-import {useDispatch, useSelector} from 'react-redux'
+import {useDispatch} from 'react-redux'
 import {setUser} from '../store/actions/user'
 import {ADMIN_ROUTE, LOGIN_ROUTE, OPERATOR_ROUTE, PASSENGER_ROUTE, REGISTRATION_ROUTE} from '../utils/consts'
 
@@ -19,8 +19,6 @@ const Auth = () => {
     const setLoginUser = (user) => {
         dispatch(setUser(user))
     }
-
-    // const stateUser = useSelector(state => state.userReducer)
 
     const authorize = async () => {
         try {

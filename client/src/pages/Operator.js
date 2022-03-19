@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react'
 import {cancelFlight, getAllFlights, searchFlights} from "../http/flightsAPI";
 import {Button, Col, Container, Form, Row, Table} from "react-bootstrap";
-import {ticketAdder, ticketRemover} from "../http/ticAPIkets";
+import {ticketAdder, ticketRemover} from "../http/ticketsAPI";
 import {setUser} from "../store/actions/user";
 import {useDispatch, useSelector} from "react-redux";
 
@@ -16,7 +16,6 @@ const Operator = () => {
     useEffect(() => {
         getAllFlights()
             .then(data => {
-                console.log(data)
                 setFlights(data)
             })
     }, [])
@@ -42,12 +41,26 @@ const Operator = () => {
     }
 
     const setBtn = (flight) => {
-        if (flight.isActive) {
+        const dateNow = new Date()
+        if (flight.isActive && new Date(flight.departureDate) <= dateNow) {
+            return <Button disabled variant="danger">Отменить</Button>
+        } else if (flight.isActive) {
             return <Button
                 onClick={() => cancel(flight.id)}
                 variant="danger">Отменить</Button>
         } else {
             return <Button disabled variant="danger">Отменить</Button>
+        }
+    }
+
+    const setFlightStatus = (flight) => {
+        const dateNow = new Date()
+        if (flight.isActive && new Date(flight.departureDate) <= dateNow) {
+            return 'Совершен'
+        } else if (flight.isActive) {
+            return 'Ожидается'
+        } else if (!flight.isActive) {
+            return 'Отменен'
         }
     }
 
@@ -126,12 +139,10 @@ const Operator = () => {
                                             <td>{flight.destinationAirport}</td>
                                             <td>{formatter.format(new Date(flight.departureDate))}</td>
                                             <td>{flight.seatsAmount}</td>
-                                            <td>{flight.isActive ? 'Ожидается' : 'Отменен'}</td>
-                                            <td>
-                                                {
-                                                    setBtn(flight)
-                                                }
-                                            </td>
+                                            <td>{setFlightStatus(flight)}</td>
+                                            <td>{setBtn(flight)}</td>
+                                            <td><Button
+                                            >Подробнее</Button></td>
                                         </tr>
                                     )
                                 })

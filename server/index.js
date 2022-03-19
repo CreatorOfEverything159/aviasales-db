@@ -96,6 +96,22 @@ const start = async () => {
             seatsAmount: 50,
             isActive: true
         })
+        await Flight.create({
+            number: 'S70001',
+            departureDate: new Date(),
+            departureAirport: LED.airport,
+            destinationAirport: AER.airport,
+            seatsAmount: 50,
+            isActive: true
+        })
+        await Flight.create({
+            number: 'S70002',
+            departureDate: new Date(),
+            departureAirport: AER.airport,
+            destinationAirport: LED.airport,
+            seatsAmount: 50,
+            isActive: true
+        })
 
         // create passengers
         await Passenger.create({passport: '1234567890', fio: 'Иванов Иван Иванович'})

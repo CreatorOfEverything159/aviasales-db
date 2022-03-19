@@ -2,7 +2,7 @@ import React, {useEffect, useState} from 'react'
 import {Button, Col, Container, Form, Row, Table} from 'react-bootstrap'
 import {getAllFlights, searchFlights} from '../http/flightsAPI'
 import {useDispatch, useSelector} from 'react-redux'
-import {ticketAdder, ticketRemover} from '../http/ticAPIkets'
+import {ticketAdder, ticketRemover} from '../http/ticketsAPI'
 import {setUser} from '../store/actions/user'
 
 const Flights = () => {
@@ -36,6 +36,10 @@ const Flights = () => {
                 .then(data => {
                     stateUser.tickets.push(data)
                     dispatch(setUser({tickets: [...stateUser.tickets]}))
+                    getAllFlights()
+                        .then(data => {
+                            setFlights(data)
+                        })
                 })
         } catch (e) {
             alert(e.response.data.message)
@@ -48,6 +52,10 @@ const Flights = () => {
                 .then(data => {
                     stateUser.tickets.splice(stateUser.tickets.findIndex(ticket => ticket.flightId === flightId), 1)
                     dispatch(setUser({tickets: [...stateUser.tickets]}))
+                    getAllFlights()
+                        .then(data => {
+                            setFlights(data)
+                        })
                 })
         } catch (e) {
             alert(e.response.data.message)
@@ -56,16 +64,29 @@ const Flights = () => {
 
     const setBtn = (flight) => {
         const flightsIds = stateUser.tickets.map(({flightId}) => flightId)
+        const dateNow = new Date()
         if (stateUser.auth) {
             if (stateUser.userRole === 'Пассажир') {
-                if (flightsIds.includes(flight.id)) {
+                if (flightsIds.includes(flight.id) && new Date(flight.departureDate) <= dateNow) {
+                    return <Button
+                        onClick={() => {
+                            removeTicket(flight.id)
+                        }}
+                        disabled
+                        variant="danger">Отменить бронь</Button>
+                } else if (flightsIds.includes(flight.id)) {
                     return <Button
                         onClick={() => {
                             removeTicket(flight.id)
                         }}
                         variant="danger">Отменить бронь</Button>
+                } else if (!flightsIds.includes(flight.id) && new Date(flight.departureDate) <= dateNow) {
+                    return <Button disabled variant="warning">Забронировать</Button>
                 }
                 if (!flight.isActive) {
+                    return <Button disabled variant="warning">Забронировать</Button>
+                }
+                if (flight.seatsAmount === 0) {
                     return <Button disabled variant="warning">Забронировать</Button>
                 }
                 return <Button
@@ -78,6 +99,17 @@ const Flights = () => {
             }
         } else {
             return <Button disabled variant="warning">Забронировать</Button>
+        }
+    }
+
+    const setFlightStatus = (flight) => {
+        const dateNow = new Date()
+        if (flight.isActive && new Date(flight.departureDate) <= dateNow) {
+            return 'Совершен'
+        } else if (flight.isActive) {
+            return 'Ожидается'
+        } else if (!flight.isActive) {
+            return 'Отменен'
         }
     }
 
@@ -157,6 +189,8 @@ const Flights = () => {
                             <tbody>
                             {
                                 flights.map(flight => {
+                                    const dateNow = new Date()
+                                    if (new Date(flight.departureDate) > dateNow)
                                         return (
                                             <tr key={flight.id}>
                                                 <td>{flight.number}</td>
@@ -166,12 +200,8 @@ const Flights = () => {
                                                 <td>{flight.destinationAirport}</td>
                                                 <td>{formatter.format(new Date(flight.departureDate))}</td>
                                                 <td>{flight.seatsAmount}</td>
-                                                <td>{flight.isActive ? 'Ожидается' : 'Отменен'}</td>
-                                                <td>
-                                                    {
-                                                        setBtn(flight)
-                                                    }
-                                                </td>
+                                                <td>{setFlightStatus(flight)}</td>
+                                                <td>{setBtn(flight)}</td>
                                             </tr>
                                         )
                                     }
