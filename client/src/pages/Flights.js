@@ -26,7 +26,8 @@ const Flights = () => {
         month: "long",
         day: "numeric",
         hour: "numeric",
-        minute: "numeric"
+        minute: "numeric",
+        timeZone: "Europe/Moscow"
     })
 
     const addTicket = (flightId) => {
@@ -64,6 +65,9 @@ const Flights = () => {
                         }}
                         variant="danger">Отменить бронь</Button>
                 }
+                if (!flight.isActive) {
+                    return <Button disabled variant="warning">Забронировать</Button>
+                }
                 return <Button
                     onClick={() => {
                         addTicket(flight.id)
@@ -79,7 +83,9 @@ const Flights = () => {
 
     const search = () => {
         searchFlights(searchDepartureCity, searchDestinationCity, searchDepartureDate)
-            .then(data => setFlights(data))
+            .then(data => {
+                setFlights(data)
+            })
     }
 
     return (

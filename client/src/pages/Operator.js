@@ -27,7 +27,8 @@ const Operator = () => {
         month: "long",
         day: "numeric",
         hour: "numeric",
-        minute: "numeric"
+        minute: "numeric",
+        timeZone: "Europe/Moscow"
     })
 
     const cancel = async (id) => {
@@ -46,7 +47,7 @@ const Operator = () => {
                 onClick={() => cancel(flight.id)}
                 variant="danger">Отменить</Button>
         } else {
-            return <Button disabled variant="warning">Отменить</Button>
+            return <Button disabled variant="danger">Отменить</Button>
         }
     }
 

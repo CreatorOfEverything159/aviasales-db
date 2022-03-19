@@ -1,5 +1,5 @@
 const {Flight, AirportCity} = require('../models/models')
-const { Op } = require('@sequelize/core')
+const {Op} = require('@sequelize/core')
 const ApiStatus = require('../status/ApiStatus')
 
 class FlightController {
@@ -24,14 +24,16 @@ class FlightController {
         }
 
         const {departureCity, destinationCity, departureDate} = req.body
-        const departureAirports = await AirportCity.findAll({where:
+        const departureAirports = await AirportCity.findAll({
+            where:
                 {
                     city: {[Op.substring]: departureCity}
                 }
         })
         const depAir = departureAirports.map(({dataValues}) => dataValues.airport)
 
-        const destinationAirports = await AirportCity.findAll({where:
+        const destinationAirports = await AirportCity.findAll({
+            where:
                 {
                     city: {[Op.substring]: destinationCity}
                 }
@@ -44,7 +46,12 @@ class FlightController {
         // if (destinationAirports.length === 0) {
         //     return next() // TODO Error
         // }
-        const flights = await Flight.findAll({where: {
+        let date = new Date(departureDate)
+        let departureDate2 = new Date(departureDate)
+        departureDate2 = new Date(departureDate2.setDate(date.getDate() + 1))
+        console.log(date, departureDate2)
+        const flights = await Flight.findAll({
+            where: {
                 departureAirport: {
                     [Op.or]: depAir
                 },
@@ -52,7 +59,8 @@ class FlightController {
                     [Op.or]: desAir
                 },
                 departureDate: {
-                    [Op.gte]: departureDate
+                    [Op.gte]: date,
+                    [Op.lt]: departureDate2
                 }
             }
         })
@@ -69,7 +77,7 @@ class FlightController {
         if (!flight) {
             return next(ApiStatus.badRequest('Такого рейса не существует'))
         }
-        await Flight.update({isAuth: false}, {where: {id}})
+        await Flight.update({isActive: false}, {where: {id}})
         return res.json({message: 'Рейс отменен'})
     }
 
