@@ -1,15 +1,25 @@
 import React, {useEffect, useState} from 'react'
-import {cancelFlight, getAllFlights, searchFlightByNumber, searchFlights} from "../http/flightsAPI";
-import {Button, Col, Container, Form, Row, Table} from "react-bootstrap";
+import {cancelFlight, createFlight, getAllFlights, searchFlightByNumber, searchFlights} from "../http/flightsAPI";
+import {Button, Col, Container, Form, Modal, Row, Table} from "react-bootstrap";
 import {ticketAdder, ticketRemover} from "../http/ticketsAPI";
 import {setUser} from "../store/actions/user";
 import {useDispatch, useSelector} from "react-redux";
+import {passengersByFlight} from '../http/userAPI'
 
 const Operator = () => {
     const dispatch = useDispatch()
     const [flights, setFlights] = useState([])
     const [number, setNumber] = useState('')
-    const [searchDestinationCity, setSearchDestinationCity] = useState('')
+    const [flightNumber, setFlightNumber] = useState('')
+    const [departureAirport, setDepartureAirport] = useState('')
+    const [departureDate, setDepartureDate] = useState(new Date().toISOString().slice(0, 16))
+    const [destinationAirport, setDestinationAirport] = useState('')
+    const [seatsAmount, setSeatsAmount] = useState(50)
+    const [passengers, setPassengers] = useState([])
+    const [flight, setFlight] = useState({})
+
+    const [modalShow, setModalShow] = useState(false)
+
     const [searchDepartureDate, setSearchDepartureDate] = useState(new Date().toISOString().slice(0, 10))
     const stateUser = useSelector(state => state.userReducer)
 
@@ -26,15 +36,16 @@ const Operator = () => {
         month: "long",
         day: "numeric",
         hour: "numeric",
-        minute: "numeric",
-        timeZone: "Europe/Moscow"
+        minute: "numeric"
     })
 
     const cancel = async (id) => {
         try {
             const data = await cancelFlight(id)
             alert(data.message)
-            getAllFlights().then(data => {setFlights(data)})
+            getAllFlights().then(data => {
+                setFlights(data)
+            })
         } catch (e) {
             alert(e.response.data.message)
         }
@@ -69,11 +80,153 @@ const Operator = () => {
             .then(data => setFlights(data))
     }
 
+    const create = async () => {
+        try {
+            const data = await createFlight(flightNumber, departureAirport, destinationAirport, departureDate, seatsAmount)
+            alert(data.message)
+
+            getAllFlights()
+                .then(data => {
+                    setFlights(data)
+                })
+        } catch (e) {
+            alert(e.response.data.message)
+        }
+    }
+
+    const detail = async (flight) => {
+        try {
+            const data = await passengersByFlight(flight.id)
+            setPassengers(data)
+            setFlight(flight)
+            setModalShow(true)
+        }catch (e) {
+            alert(e.response.data.message)
+        }
+    }
+
+    const MyVerticallyCenteredModal = (props) => {
+        const formatter = new Intl.DateTimeFormat("ru", {
+            weekday: "long",
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+            hour: "numeric",
+            minute: "numeric"
+        })
+
+        return (
+            <Modal {...props} size="lg" aria-labelledby="contained-modal-title-vcenter" centered>
+                <Modal.Header closeButton>
+                    <Modal.Title id="contained-modal-title-vcenter">
+                        Пасажиры рейса {props?.flight?.number} ({props?.flight?.departureDate ? formatter.format(new Date(props.flight.departureDate)) : ''})
+                    </Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <Table className="mt-4">
+                        <thead>
+                        <tr>
+                            <th>№</th>
+                            <th>Серия и номер паспорта</th>
+                            <th>ФИО</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {
+                            props.passengers.map((passenger, index) => {
+                                return (
+                                    <tr key={passenger.passport}>
+                                        <td>{index + 1}</td>
+                                        <td>{passenger.passport}</td>
+                                        <td>{passenger.fio}</td>
+                                    </tr>
+                                )
+                            })
+                        }
+                        </tbody>
+                    </Table>
+
+                </Modal.Body>
+            </Modal>
+        )
+    }
+
     return (
         <>
             <Container style={{marginTop: 30}}>
                 <h1 className="mt-4">Панель оператора</h1>
                 <hr/>
+            </Container>
+            <Container style={{marginTop: 30}}>
+                <h2 className="mt-4">Создание рейса</h2>
+                <Form className="">
+                    <Row className="p-2 d-flex">
+                        <Col md={2} style={{padding: '5px'}}>
+                            <Form.Group controlId="formFlightNumber">
+                                <Form.Text className="text-muted">
+                                    Номер рейса
+                                </Form.Text>
+                                <Form.Control
+                                    value={flightNumber}
+                                    onChange={e => setFlightNumber(e.target.value)}
+                                    type="text"
+                                    placeholder="Номер рейса"/>
+                            </Form.Group>
+                        </Col>
+                        <Col md={2} style={{padding: '5px'}}>
+                            <Form.Group controlId="formDepartureAirport">
+                                <Form.Text className="text-muted">
+                                    Аэропорт вылета
+                                </Form.Text>
+                                <Form.Control
+                                    value={departureAirport}
+                                    onChange={e => setDepartureAirport(e.target.value)}
+                                    type="text"
+                                    placeholder="Аэропорт вылета"/>
+                            </Form.Group>
+                        </Col>
+                        <Col md={2} style={{padding: '5px'}}>
+                            <Form.Group controlId="formFlightNumber">
+                                <Form.Text className="text-muted">
+                                    Аэропорт назначения
+                                </Form.Text>
+                                <Form.Control
+                                    value={destinationAirport}
+                                    onChange={e => setDestinationAirport(e.target.value)}
+                                    type="text"
+                                    placeholder="Аэропорт назначения"/>
+                            </Form.Group>
+                        </Col>
+                        <Col md={2} style={{padding: '5px'}}>
+                            <Form.Group controlId="formSeatsAmount">
+                                <Form.Text className="text-muted">
+                                    Количество мест
+                                </Form.Text>
+                                <Form.Control
+                                    value={seatsAmount}
+                                    onChange={e => setSeatsAmount(e.target.value)}
+                                    type="number"
+                                    placeholder="Количество мест"/>
+                            </Form.Group>
+                        </Col>
+                        <Col md={2} style={{padding: '5px'}}>
+                            <Form.Group controlId="formDepartureDate">
+                                <Form.Text className="text-muted">
+                                    Дата вылета
+                                </Form.Text>
+                                <Form.Control
+                                    value={departureDate}
+                                    onChange={e => setDepartureDate(e.target.value)}
+                                    type="datetime-local"
+                                    min={new Date().toISOString().slice(0, 16)}
+                                    placeholder="Дата вылета"/>
+                            </Form.Group>
+                        </Col>
+                        <Col md={1} style={{padding: '5px', alignSelf: 'end'}}>
+                            <Button onClick={create}>Создать</Button>
+                        </Col>
+                    </Row>
+                </Form>
             </Container>
             <Container>
                 <h2 className="mt-4">Поиск рейсов</h2>
@@ -118,8 +271,6 @@ const Operator = () => {
                             <thead>
                             <tr>
                                 <th>Номер рейса</th>
-                                <th>Город вылета</th>
-                                <th>Город назначения</th>
                                 <th>Аэропорт вылета</th>
                                 <th>Аэропорт назначения</th>
                                 <th>Дата и время вылета</th>
@@ -133,8 +284,6 @@ const Operator = () => {
                                     return (
                                         <tr key={flight.id}>
                                             <td>{flight.number}</td>
-                                            <td>{flight.departureCity}</td>
-                                            <td>{flight.destinationCity}</td>
                                             <td>{flight.departureAirport}</td>
                                             <td>{flight.destinationAirport}</td>
                                             <td>{formatter.format(new Date(flight.departureDate))}</td>
@@ -142,6 +291,9 @@ const Operator = () => {
                                             <td>{setFlightStatus(flight)}</td>
                                             <td>{setBtn(flight)}</td>
                                             <td><Button
+                                                onClick={() => {
+                                                    detail(flight)
+                                                }}
                                             >Подробнее</Button></td>
                                         </tr>
                                     )
@@ -153,6 +305,11 @@ const Operator = () => {
                 }
 
             </Container>
+            <MyVerticallyCenteredModal
+                flight={flight}
+                passengers={passengers}
+                show={modalShow}
+                onHide={() => setModalShow(false)}/>
         </>
     )
 }

@@ -7,6 +7,8 @@ const cors = require('cors')
 const {UserRole, User, Flight, AirportCity, Passenger, Ticket} = require('./models/models')
 const statusHandler = require('./middleware/StatusHandligMiddleware')
 
+// process.env.TZ = 'Asia/Vladivostok'
+
 const PORT = process.env.PORT || 5000
 
 const app = express()
@@ -112,6 +114,25 @@ const start = async () => {
             seatsAmount: 50,
             isActive: true
         })
+        await Flight.create({
+            number: 'AA0000',
+            departureDate: new Date(2022, 11, 9, 12, 0),
+            departureAirport: AER.airport,
+            destinationAirport: LED.airport,
+            seatsAmount: 0,
+            isActive: true
+        })
+
+        for (let i = 0; i < 48; i++) {
+            await Flight.create({
+                number: `AA00${i}`,
+                departureDate: new Date(2022, 3, 1, i, 0),
+                departureAirport: AER.airport,
+                destinationAirport: LED.airport,
+                seatsAmount: 1,
+                isActive: true
+            })
+        }
 
         // create passengers
         await Passenger.create({passport: '1234567890', fio: 'Иванов Иван Иванович'})
@@ -125,7 +146,7 @@ const start = async () => {
         await User.create({login: 'passenger', password: '12345', userRoleId: passengerRole.id, passengerPassport: '0521832145'})
 
         // add tickets
-        // await Ticket.create({flightId: 4, passengerPassport: '0521832145'})
+        await Ticket.create({flightId: 4, passengerPassport: '0521832145'})
 
         app.listen(PORT, () => console.log(`Server started on http://localhost:${PORT}`))
     } catch (e) {

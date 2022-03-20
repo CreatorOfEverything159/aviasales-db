@@ -18,6 +18,10 @@ class FlightController {
     }
 
     async search(req, res, next) {
+        const dateToUtcDate = (date) => {
+            return new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate(), date.getHours() - 20, date.getMinutes()))
+        }
+
         const getCity = async (airport) => {
             const city = await AirportCity.findOne({where: {airport: airport}})
             return city.dataValues.city
@@ -59,8 +63,8 @@ class FlightController {
                     [Op.or]: desAir
                 },
                 departureDate: {
-                    [Op.gte]: date,
-                    [Op.lt]: departureDate2
+                    [Op.gte]: dateToUtcDate(date),
+                    [Op.lt]: dateToUtcDate(departureDate2)
                 }
             }
         })
@@ -72,21 +76,45 @@ class FlightController {
     }
 
     async searching(req, res, next) {
+        const dateToUtcDate = (date) => {
+            return new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate(), date.getHours() - 20, date.getMinutes()))
+        }
+
         const {number, departureDate} = req.body
+
+        // let departDate = new Date(departureDate)
+        // let newDate = new Date(departureDate)
+        // newDate = new Date(newDate.setHours(departDate.getHours() + 9))
+
         let date = new Date(departureDate)
         let departureDate2 = new Date(departureDate)
         departureDate2 = new Date(departureDate2.setDate(date.getDate() + 1))
-        const flights = await Flight.findAll({
-            where: {
-                number: {
-                    [Op.substring]: number
-                },
-                departureDate: {
-                    [Op.gte]: date,
-                    [Op.lt]: departureDate2
+        console.log(date, '<= x <', departureDate2)
+
+        console.log(dateToUtcDate(date), '<= x <', dateToUtcDate(departureDate2))
+        let flights
+        if (date == 'Invalid Date') {
+            flights = await Flight.findAll({
+                where: {
+                    number: {
+                        [Op.substring]: number
+                    }
                 }
-            }
-        })
+            })
+        } else {
+            flights = await Flight.findAll({
+                where: {
+                    number: {
+                        [Op.substring]: number
+                    },
+                    departureDate: {
+                        [Op.gte]: dateToUtcDate(date),
+                        [Op.lt]: dateToUtcDate(departureDate2)
+                    }
+                }
+            })
+        }
+
         return res.json(flights)
     }
 
@@ -98,6 +126,52 @@ class FlightController {
         }
         await Flight.update({isActive: false}, {where: {id}})
         return res.json({message: 'Рейс отменен'})
+    }
+
+    async create(req, res, next) {
+        const dateToUtcDate = (date) => {
+            return new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate(), date.getHours() - 10, date.getMinutes()))
+        }
+
+        const {number, departureAirport, destinationAirport, departureDate, seatsAmount} = req.body
+        const depAirport = await AirportCity.findOne({where: {airport: departureAirport}})
+        if (!depAirport) {
+            return next(ApiStatus.badRequest(`Такого аэропорта вылета не существует`))
+        }
+        const desAirport = await AirportCity.findOne({where: {airport: destinationAirport}})
+        if (!desAirport) {
+            return next(ApiStatus.badRequest(`Такого аэропорта назначения не существует`))
+        }
+        let dateFrom = `${departureDate}`.slice(0, 10)
+        dateFrom = new Date(dateFrom)
+        let dateTo = new Date(dateFrom)
+        dateTo = new Date(dateTo.setDate(dateFrom.getDate() + 1))
+        console.log(dateFrom, '<>', dateTo)
+        const flights = await Flight.findAll({
+            where: {
+                number: {
+                    [Op.eq]: number
+                },
+                departureDate: {
+                    [Op.gte]: dateFrom,
+                    [Op.lt]: dateTo
+                }
+            }
+        })
+        console.log(flights)
+        if (flights.length !== 0) {
+            return next(ApiStatus.badRequest(`Рейс уже существует`))
+        }
+        let newDate = new Date(departureDate)
+        await Flight.create({
+            number,
+            departureDate: newDate,
+            departureAirport,
+            destinationAirport,
+            seatsAmount,
+            isActive: true
+        })
+        return res.json({message: 'Рейс успешно создан'})
     }
 
 }

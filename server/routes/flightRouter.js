@@ -6,5 +6,6 @@ router.get('/', flightController.getAll)
 router.post('/search', flightController.search)
 router.post('/cancel', flightController.cancel)
 router.post('/searching', flightController.searching)
+router.post('/create', flightController.create)
 
 module.exports = router

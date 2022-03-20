@@ -26,8 +26,7 @@ const Flights = () => {
         month: "long",
         day: "numeric",
         hour: "numeric",
-        minute: "numeric",
-        timeZone: "Europe/Moscow"
+        minute: "numeric"
     })
 
     const addTicket = (flightId) => {

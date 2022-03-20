@@ -42,3 +42,8 @@ export const removeUser = async (login, role) => {
     const {data} = await $authHost.post('api/user/remove',{login, role})
     return data
 }
+
+export const passengersByFlight = async (flightId) => {
+    const {data} = await $authHost.post('api/passenger',{flightId})
+    return data
+}

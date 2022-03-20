@@ -20,3 +20,8 @@ export const searchFlightByNumber = async (number, departureDate) => {
     const {data} = await $authHost.post('api/flight/searching', {number, departureDate})
     return data
 }
+
+export const createFlight = async (number, departureAirport, destinationAirport, departureDate, seatsAmount) => {
+    const {data} = await $authHost.post('api/flight/create', {number, departureAirport, destinationAirport, departureDate, seatsAmount})
+    return data
+}
