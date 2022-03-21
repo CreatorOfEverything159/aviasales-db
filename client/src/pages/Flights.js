@@ -112,18 +112,20 @@ const Flights = () => {
         }
     }
 
-    const search = () => {
-        searchFlights(searchDepartureCity, searchDestinationCity, searchDepartureDate)
-            .then(data => {
-                setFlights(data)
-            })
+    const search = async () => {
+        try {
+            const data = await searchFlights(searchDepartureCity, searchDestinationCity, searchDepartureDate)
+            setFlights(data)
+        } catch (e) {
+            alert(e.response.data.message)
+        }
     }
 
     return (
         <>
             <Container>
                 <h1 className="mt-4">Поиск билетов</h1>
-                <Form className="">
+                <Form noValidate={false} className="">
                     <Row className="p-2 d-flex">
                         <Col md={3} style={{padding: '5px'}}>
                             <Form.Group controlId="formDepartureCity">

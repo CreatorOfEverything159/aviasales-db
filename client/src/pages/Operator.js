@@ -1,13 +1,9 @@
 import React, {useEffect, useState} from 'react'
-import {cancelFlight, createFlight, getAllFlights, searchFlightByNumber, searchFlights} from "../http/flightsAPI";
-import {Button, Col, Container, Form, Modal, Row, Table} from "react-bootstrap";
-import {ticketAdder, ticketRemover} from "../http/ticketsAPI";
-import {setUser} from "../store/actions/user";
-import {useDispatch, useSelector} from "react-redux";
+import {cancelFlight, createFlight, getAllFlights, searchFlightByNumber} from '../http/flightsAPI'
+import {Button, Col, Container, Form, Modal, Row, Table} from 'react-bootstrap'
 import {passengersByFlight} from '../http/userAPI'
 
 const Operator = () => {
-    const dispatch = useDispatch()
     const [flights, setFlights] = useState([])
     const [number, setNumber] = useState('')
     const [flightNumber, setFlightNumber] = useState('')
@@ -17,11 +13,8 @@ const Operator = () => {
     const [seatsAmount, setSeatsAmount] = useState(50)
     const [passengers, setPassengers] = useState([])
     const [flight, setFlight] = useState({})
-
     const [modalShow, setModalShow] = useState(false)
-
     const [searchDepartureDate, setSearchDepartureDate] = useState(new Date().toISOString().slice(0, 10))
-    const stateUser = useSelector(state => state.userReducer)
 
     useEffect(() => {
         getAllFlights()
@@ -100,7 +93,7 @@ const Operator = () => {
             setPassengers(data)
             setFlight(flight)
             setModalShow(true)
-        }catch (e) {
+        } catch (e) {
             alert(e.response.data.message)
         }
     }
@@ -119,7 +112,8 @@ const Operator = () => {
             <Modal {...props} size="lg" aria-labelledby="contained-modal-title-vcenter" centered>
                 <Modal.Header closeButton>
                     <Modal.Title id="contained-modal-title-vcenter">
-                        Пасажиры рейса {props?.flight?.number} ({props?.flight?.departureDate ? formatter.format(new Date(props.flight.departureDate)) : ''})
+                        Пасажиры
+                        рейса {props?.flight?.number} ({props?.flight?.departureDate ? formatter.format(new Date(props.flight.departureDate)) : ''})
                     </Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
@@ -168,9 +162,17 @@ const Operator = () => {
                                 </Form.Text>
                                 <Form.Control
                                     value={flightNumber}
-                                    onChange={e => setFlightNumber(e.target.value)}
+                                    isInvalid={!(flightNumber.length === 6 && /[A-Z]{2,}[0-9]{4,}/.test(flightNumber))}
+                                    isValid={(flightNumber.length === 6) && /[A-Z]{2,}[0-9]{4,}/.test(flightNumber)}
+                                    onChange={e => setFlightNumber(e.target.value
+                                        .replace(/[a-z]/g, function (u) {
+                                            return u.toUpperCase()
+                                        }))}
                                     type="text"
                                     placeholder="Номер рейса"/>
+                                <Form.Control.Feedback type="invalid">
+                                    6 символов (AA0000)
+                                </Form.Control.Feedback>
                             </Form.Group>
                         </Col>
                         <Col md={2} style={{padding: '5px'}}>
@@ -180,9 +182,16 @@ const Operator = () => {
                                 </Form.Text>
                                 <Form.Control
                                     value={departureAirport}
-                                    onChange={e => setDepartureAirport(e.target.value)}
+                                    isInvalid={!(departureAirport.length === 3 && /[A-Z]{3,}/.test(departureAirport))}
+                                    isValid={(departureAirport.length === 3 && /[A-Z]{3,}/.test(departureAirport))}
+                                    onChange={e => setDepartureAirport(e.target.value.replace(/[a-z]/g, function (u) {
+                                        return u.toUpperCase()
+                                    }))}
                                     type="text"
                                     placeholder="Аэропорт вылета"/>
+                                <Form.Control.Feedback type="invalid">
+                                    3 символа (AAA)
+                                </Form.Control.Feedback>
                             </Form.Group>
                         </Col>
                         <Col md={2} style={{padding: '5px'}}>
@@ -192,9 +201,16 @@ const Operator = () => {
                                 </Form.Text>
                                 <Form.Control
                                     value={destinationAirport}
-                                    onChange={e => setDestinationAirport(e.target.value)}
+                                    isInvalid={!(destinationAirport.length === 3 && /[A-Z]{3,}/.test(destinationAirport))}
+                                    isValid={(destinationAirport.length === 3 && /[A-Z]{3,}/.test(destinationAirport))}
+                                    onChange={e => setDestinationAirport(e.target.value.replace(/[a-z]/g, function (u) {
+                                        return u.toUpperCase()
+                                    }))}
                                     type="text"
                                     placeholder="Аэропорт назначения"/>
+                                <Form.Control.Feedback type="invalid">
+                                    3 символа (AAA)
+                                </Form.Control.Feedback>
                             </Form.Group>
                         </Col>
                         <Col md={2} style={{padding: '5px'}}>
@@ -204,9 +220,14 @@ const Operator = () => {
                                 </Form.Text>
                                 <Form.Control
                                     value={seatsAmount}
-                                    onChange={e => setSeatsAmount(e.target.value)}
+                                    onChange={e => setSeatsAmount(e.target.value.replace(/[^0-9]/, ''))}
+                                    isInvalid={!(seatsAmount >= 50 && seatsAmount <= 100)}
+                                    isValid={(seatsAmount >= 50 && seatsAmount <= 100)}
                                     type="number"
                                     placeholder="Количество мест"/>
+                                <Form.Control.Feedback type="invalid">
+                                    От 50 до 100
+                                </Form.Control.Feedback>
                             </Form.Group>
                         </Col>
                         <Col md={2} style={{padding: '5px'}}>
@@ -223,7 +244,14 @@ const Operator = () => {
                             </Form.Group>
                         </Col>
                         <Col md={1} style={{padding: '5px', alignSelf: 'end'}}>
-                            <Button onClick={create}>Создать</Button>
+                            <Button
+                                disabled={!(
+                                    (flightNumber.length === 6) && /[A-Z]{2,}[0-9]{4,}/.test(flightNumber)
+                                    && (departureAirport.length === 3 && /[A-Z]{3,}/.test(departureAirport))
+                                    && (destinationAirport.length === 3 && /[A-Z]{3,}/.test(destinationAirport))
+                                    && (seatsAmount >= 50 && seatsAmount <= 100)
+                                )}
+                                onClick={create}>Создать</Button>
                         </Col>
                     </Row>
                 </Form>

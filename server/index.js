@@ -23,7 +23,7 @@ app.use(statusHandler)
 const start = async () => {
     try {
         await sequelize.authenticate()
-        await sequelize.sync({ force: true})
+        await sequelize.sync({force: true})
 
         // create roles
         await UserRole.create({role: 'Администратор'})
@@ -41,6 +41,9 @@ const start = async () => {
         await AirportCity.create({airport: 'AER', city: 'Сочи'})
         await AirportCity.create({airport: 'LED', city: 'Санкт-Петербург'})
         await AirportCity.create({airport: 'OGZ', city: 'Владикавказ'})
+        await AirportCity.create({airport: 'ABC', city: 'Албасет'})
+        await AirportCity.create({airport: 'ZAH', city: 'Захедан'})
+        await AirportCity.create({airport: 'MEB', city: 'Мельбурн'})
 
         // get airport-cities
         const VVO = await AirportCity.findOne({where: {airport: 'VVO'}})
@@ -48,105 +51,131 @@ const start = async () => {
         const AER = await AirportCity.findOne({where: {airport: 'AER'}})
         const LED = await AirportCity.findOne({where: {airport: 'LED'}})
         const OGZ = await AirportCity.findOne({where: {airport: 'OGZ'}})
+        const ABC = await AirportCity.findOne({where: {airport: 'ABC'}})
+        const ZAH = await AirportCity.findOne({where: {airport: 'ZAH'}})
+        const MEB = await AirportCity.findOne({where: {airport: 'MEB'}})
+
+        const airports = [VVO, SVO, AER, LED, OGZ, ABC, ZAH, MEB]
 
         // create flights
-        await Flight.create({
-            number: 'SU1234',
-            departureDate: new Date(2022, 5, 6, 7, 30),
-            departureAirport: VVO.airport,
-            destinationAirport: SVO.airport,
-            seatsAmount: 100,
-            isActive: true
-        })
-        await Flight.create({
-            number: 'SU1235',
-            departureDate: new Date(2022, 5, 8, 18, 30),
-            departureAirport: SVO.airport,
-            destinationAirport: VVO.airport,
-            seatsAmount: 100,
-            isActive: true
-        })
-        await Flight.create({
-            number: 'SU6666',
-            departureDate: new Date(2022, 4, 8, 17, 20),
-            departureAirport: VVO.airport,
-            destinationAirport: OGZ.airport,
-            seatsAmount: 100,
-            isActive: true
-        })
-        await Flight.create({
-            number: 'SU6667',
-            departureDate: new Date(2022, 4, 9, 0, 0),
-            departureAirport: OGZ.airport,
-            destinationAirport: VVO.airport,
-            seatsAmount: 100,
-            isActive: true
-        })
-        await Flight.create({
-            number: 'SU9090',
-            departureDate: new Date(2022, 5, 7, 12, 45),
-            departureAirport: AER.airport,
-            destinationAirport: LED.airport,
-            seatsAmount: 50,
-            isActive: true
-        })
-        await Flight.create({
-            number: 'SU9091',
-            departureDate: new Date(2022, 5, 9, 23, 0),
-            departureAirport: LED.airport,
-            destinationAirport: AER.airport,
-            seatsAmount: 50,
-            isActive: true
-        })
-        await Flight.create({
-            number: 'S70001',
-            departureDate: new Date(),
-            departureAirport: LED.airport,
-            destinationAirport: AER.airport,
-            seatsAmount: 50,
-            isActive: true
-        })
-        await Flight.create({
-            number: 'S70002',
-            departureDate: new Date(),
-            departureAirport: AER.airport,
-            destinationAirport: LED.airport,
-            seatsAmount: 50,
-            isActive: true
-        })
-        await Flight.create({
-            number: 'AA0000',
-            departureDate: new Date(2022, 11, 9, 12, 0),
-            departureAirport: AER.airport,
-            destinationAirport: LED.airport,
-            seatsAmount: 0,
-            isActive: true
-        })
-
-        for (let i = 0; i < 48; i++) {
+        for (let i = 10; i < 99; i++) {
             await Flight.create({
                 number: `AA00${i}`,
-                departureDate: new Date(2022, 3, 1, i, 0),
-                departureAirport: AER.airport,
-                destinationAirport: LED.airport,
-                seatsAmount: 1,
+                departureDate: new Date(2022, 3, i - 10, i, i),
+                departureAirport: airports[i % airports.length].airport,
+                destinationAirport: airports[(i + Math.floor(Math.random() * (airports.length - 1)) + 1) % airports.length].airport,
+                seatsAmount: 50,
                 isActive: true
             })
         }
 
         // create passengers
-        await Passenger.create({passport: '1234567890', fio: 'Иванов Иван Иванович'})
-        await Passenger.create({passport: '0521832145', fio: 'Марков Андрей Владимирович'})
-        await Passenger.create({passport: '1234123456', fio: 'Ким Ир Сен'})
-        await Passenger.create({passport: '9999111111', fio: 'П Владимир Владимирович'})
+        await Passenger.create({passport: '0521111111', fio: 'Курочкин Марк Михайлович'})
+        await Passenger.create({passport: '0521222222', fio: 'Богомолов Демид Маркович'})
+        await Passenger.create({passport: '0521333333', fio: 'Ананьев Александр Владимирович'})
+        await Passenger.create({passport: '0521444444', fio: 'Тихонова Виктория Марковна'})
+        await Passenger.create({passport: '0521555555', fio: 'Филимонова Мария Артемьевна'})
+        await Passenger.create({passport: '0521666666', fio: 'Антипов Александр Андреевич'})
+        await Passenger.create({passport: '0521777777', fio: 'Шувалов Дмитрий Матвеевич'})
+        await Passenger.create({passport: '0521888888', fio: 'Коровина Яна Марковна'})
+        await Passenger.create({passport: '0521999999', fio: 'Попов Андрей Кириллович'})
+        await Passenger.create({passport: '0521000000', fio: 'Кочетков Антон Григорьевич'})
+        await Passenger.create({passport: '0521121212', fio: 'Поляков Ярослав Александрович'})
+        await Passenger.create({passport: '0521909090', fio: 'Лапшин Александр Матвеевич'})
 
         // create users
-        await User.create({login: 'admin', password: '12345', userRoleId: adminRole.id})
-        await User.create({login: 'operator', password: '12345', userRoleId: operatorRole.id})
-        await User.create({login: 'passenger', password: '12345', userRoleId: passengerRole.id, passengerPassport: '0521832145'})
+        await User.create({login: 'admin', password: '1234', userRoleId: adminRole.id})
+        await User.create({login: 'oper1', password: '1234', userRoleId: operatorRole.id})
+        await User.create({login: 'oper2', password: '1234', userRoleId: operatorRole.id})
+        await User.create({login: 'oper3', password: '1234', userRoleId: operatorRole.id})
+        await User.create({login: 'oper4', password: '1234', userRoleId: operatorRole.id})
+        await User.create({
+            login: 'pass1',
+            password: '1234',
+            userRoleId: passengerRole.id,
+            passengerPassport: '0521111111'
+        })
+        await User.create({
+            login: 'pass2',
+            password: '1234',
+            userRoleId: passengerRole.id,
+            passengerPassport: '0521222222'
+        })
+        await User.create({
+            login: 'pass3',
+            password: '1234',
+            userRoleId: passengerRole.id,
+            passengerPassport: '0521333333'
+        })
+        await User.create({
+            login: 'pass4',
+            password: '1234',
+            userRoleId: passengerRole.id,
+            passengerPassport: '0521444444'
+        })
+        await User.create({
+            login: 'pass5',
+            password: '1234',
+            userRoleId: passengerRole.id,
+            passengerPassport: '0521555555'
+        })
+        await User.create({
+            login: 'pass6',
+            password: '1234',
+            userRoleId: passengerRole.id,
+            passengerPassport: '0521666666'
+        })
+        await User.create({
+            login: 'pass7',
+            password: '1234',
+            userRoleId: passengerRole.id,
+            passengerPassport: '0521777777'
+        })
+        await User.create({
+            login: 'pass8',
+            password: '1234',
+            userRoleId: passengerRole.id,
+            passengerPassport: '0521888888'
+        })
+        await User.create({
+            login: 'pass9',
+            password: '1234',
+            userRoleId: passengerRole.id,
+            passengerPassport: '0521999999'
+        })
+        await User.create({
+            login: 'pass10',
+            password: '1234',
+            userRoleId: passengerRole.id,
+            passengerPassport: '0521000000'
+        })
+        await User.create({
+            login: 'pass11',
+            password: '1234',
+            userRoleId: passengerRole.id,
+            passengerPassport: '0521121212'
+        })
+        await User.create({
+            login: 'pass12',
+            password: '1234',
+            userRoleId: passengerRole.id,
+            passengerPassport: '0521909090'
+        })
 
-        // add tickets
-        await Ticket.create({flightId: 4, passengerPassport: '0521832145'})
+        const passengers = await Passenger.findAll()
+
+        for (const passenger of passengers) {
+            let randomFlightIds = []
+            const randFlightsCount = Math.floor(Math.random() * 89) + 1
+            for (let i = 0; i < randFlightsCount; i++) {
+                let randomId = Math.floor(Math.random() * 89) + 1
+                if (!randomFlightIds.includes(randomId)) {
+                    randomFlightIds.push(randomId)
+                    await Ticket.create({flightId: randomId, passengerPassport: passenger.dataValues.passport})
+                    await Flight.decrement({seatsAmount: 1}, {where: {id: randomId}})
+                }
+            }
+        }
 
         app.listen(PORT, () => console.log(`Server started on http://localhost:${PORT}`))
     } catch (e) {

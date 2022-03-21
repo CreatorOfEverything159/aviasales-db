@@ -35,7 +35,9 @@ class FlightController {
                 }
         })
         const depAir = departureAirports.map(({dataValues}) => dataValues.airport)
-
+        if (depAir.length === 0) {
+            return next(ApiStatus.badRequest('Не существует такого города вылета'))
+        }
         const destinationAirports = await AirportCity.findAll({
             where:
                 {
@@ -43,31 +45,40 @@ class FlightController {
                 }
         })
         const desAir = destinationAirports.map(({dataValues}) => dataValues.airport)
-        // if (departureAirports.length === 0) {
-        //     return next() // TODO Error
-        // }
-        // const destinationAirports = await AirportCity.findAll({where: {[Op.substring]: destinationCity}})
-        // if (destinationAirports.length === 0) {
-        //     return next() // TODO Error
-        // }
+        if (desAir.length === 0) {
+            return next(ApiStatus.badRequest('Не существует такого города назначения'))
+        }
         let date = new Date(departureDate)
         let departureDate2 = new Date(departureDate)
         departureDate2 = new Date(departureDate2.setDate(date.getDate() + 1))
-        console.log(date, departureDate2)
-        const flights = await Flight.findAll({
-            where: {
-                departureAirport: {
-                    [Op.or]: depAir
-                },
-                destinationAirport: {
-                    [Op.or]: desAir
-                },
-                departureDate: {
-                    [Op.gte]: dateToUtcDate(date),
-                    [Op.lt]: dateToUtcDate(departureDate2)
+        let flights
+        if (date == 'Invalid Date') {
+            flights = await Flight.findAll({
+                where: {
+                    departureAirport: {
+                        [Op.or]: depAir
+                    },
+                    destinationAirport: {
+                        [Op.or]: desAir
+                    }
                 }
-            }
-        })
+            })
+        } else {
+            flights = await Flight.findAll({
+                where: {
+                    departureAirport: {
+                        [Op.or]: depAir
+                    },
+                    destinationAirport: {
+                        [Op.or]: desAir
+                    },
+                    departureDate: {
+                        [Op.gte]: dateToUtcDate(date),
+                        [Op.lt]: dateToUtcDate(departureDate2)
+                    }
+                }
+            })
+        }
         for (const flight of flights) {
             flight.dataValues.departureCity = await getCity(flight.departureAirport)
             flight.dataValues.destinationCity = await getCity(flight.destinationAirport)
@@ -81,11 +92,6 @@ class FlightController {
         }
 
         const {number, departureDate} = req.body
-
-        // let departDate = new Date(departureDate)
-        // let newDate = new Date(departureDate)
-        // newDate = new Date(newDate.setHours(departDate.getHours() + 9))
-
         let date = new Date(departureDate)
         let departureDate2 = new Date(departureDate)
         departureDate2 = new Date(departureDate2.setDate(date.getDate() + 1))
@@ -114,7 +120,6 @@ class FlightController {
                 }
             })
         }
-
         return res.json(flights)
     }
 
@@ -130,7 +135,7 @@ class FlightController {
 
     async create(req, res, next) {
         const dateToUtcDate = (date) => {
-            return new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate(), date.getHours() - 10, date.getMinutes()))
+            return new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate(), date.getHours() - 20, date.getMinutes()))
         }
 
         const {number, departureAirport, destinationAirport, departureDate, seatsAmount} = req.body
@@ -153,8 +158,8 @@ class FlightController {
                     [Op.eq]: number
                 },
                 departureDate: {
-                    [Op.gte]: dateFrom,
-                    [Op.lt]: dateTo
+                    [Op.gte]: dateToUtcDate(dateFrom),
+                    [Op.lt]: dateToUtcDate(dateTo)
                 }
             }
         })
