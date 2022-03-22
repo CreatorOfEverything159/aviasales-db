@@ -95,6 +95,7 @@ const Passenger = () => {
     return (
         <>
             <Container>
+                <h2 className="mt-4">Пассажир: {stateUser.fio}, Паспорт: {stateUser.passengerPassport}</h2>
                 <h2 className="mt-4">Забронированные билеты</h2>
                 {
                     stateUser.tickets.length !== 0
