@@ -81,10 +81,21 @@ const Passenger = () => {
         }
     }
 
+    const setFlightStatus = (flight) => {
+        const dateNow = new Date()
+        if (flight.isActive && new Date(flight.departureDate) <= dateNow) {
+            return 'Совершен'
+        } else if (flight.isActive) {
+            return 'Ожидается'
+        } else if (!flight.isActive) {
+            return 'Отменен'
+        }
+    }
+
     return (
         <>
             <Container>
-                <h1 className="mt-4">Забронированные билеты</h1>
+                <h2 className="mt-4">Забронированные билеты</h2>
                 {
                     stateUser.tickets.length !== 0
                     ? <Table className="mt-4">
@@ -96,7 +107,8 @@ const Passenger = () => {
                                 <th>Аэропорт вылета</th>
                                 <th>Аэропорт назначения</th>
                                 <th>Дата и время вылета</th>
-                                <th>Количество мест</th>
+                                <th>Свободных мест</th>
+                                <th>Статус</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -104,7 +116,7 @@ const Passenger = () => {
                                 flights.map(flight => {
                                         if (stateUser.tickets.find(ticket => ticket.flightId === flight.id))
                                             return (
-                                                <tr key={flight.id}>
+                                                <tr style={!flight.isActive ? {'color': 'red'} : {}} key={flight.id}>
                                                     <td>{flight.number}</td>
                                                     <td>{flight.departureCity}</td>
                                                     <td>{flight.destinationCity}</td>
@@ -112,6 +124,7 @@ const Passenger = () => {
                                                     <td>{flight.destinationAirport}</td>
                                                     <td>{formatter.format(new Date(flight.departureDate))}</td>
                                                     <td>{flight.seatsAmount}</td>
+                                                    <td>{setFlightStatus(flight)}</td>
                                                     <td>
                                                         {
                                                             setBtn(flight)

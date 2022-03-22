@@ -302,7 +302,7 @@ const Operator = () => {
                                 <th>Аэропорт вылета</th>
                                 <th>Аэропорт назначения</th>
                                 <th>Дата и время вылета</th>
-                                <th>Количество мест</th>
+                                <th>Свободных мест</th>
                                 <th>Статус</th>
                             </tr>
                             </thead>
@@ -310,7 +310,7 @@ const Operator = () => {
                             {
                                 flights.map(flight => {
                                     return (
-                                        <tr key={flight.id}>
+                                        <tr style={!flight.isActive ? {'color': 'red'} : {}} key={flight.id}>
                                             <td>{flight.number}</td>
                                             <td>{flight.departureAirport}</td>
                                             <td>{flight.destinationAirport}</td>

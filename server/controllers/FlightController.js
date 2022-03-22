@@ -147,6 +147,9 @@ class FlightController {
         if (!desAirport) {
             return next(ApiStatus.badRequest(`Такого аэропорта назначения не существует`))
         }
+        if (depAirport.city === desAirport.city) {
+            return next(ApiStatus.badRequest(`Города вылета и назначения не должны совпадать`))
+        }
         let dateFrom = `${departureDate}`.slice(0, 10)
         dateFrom = new Date(dateFrom)
         let dateTo = new Date(dateFrom)

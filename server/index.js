@@ -61,7 +61,7 @@ const start = async () => {
         for (let i = 10; i < 99; i++) {
             await Flight.create({
                 number: `AA00${i}`,
-                departureDate: new Date(2022, 3, i - 10, i, i),
+                departureDate: new Date(2022, 2, i, i, i),
                 departureAirport: airports[i % airports.length].airport,
                 destinationAirport: airports[(i + Math.floor(Math.random() * (airports.length - 1)) + 1) % airports.length].airport,
                 seatsAmount: 50,
