@@ -58,7 +58,7 @@ const start = async () => {
         const airports = [VVO, SVO, AER, LED, OGZ, ABC, ZAH, MEB]
 
         // create flights
-        for (let i = 10; i < 99; i++) {
+        for (let i = 10; i < 30; i++) {
             await Flight.create({
                 number: `AA00${i}`,
                 departureDate: new Date(2022, 2, i, i, i),
@@ -166,9 +166,9 @@ const start = async () => {
 
         for (const passenger of passengers) {
             let randomFlightIds = []
-            const randFlightsCount = Math.floor(Math.random() * 89) + 1
+            const randFlightsCount = Math.floor(Math.random() * 20) + 1
             for (let i = 0; i < randFlightsCount; i++) {
-                let randomId = Math.floor(Math.random() * 89) + 1
+                let randomId = Math.floor(Math.random() * 20) + 1
                 if (!randomFlightIds.includes(randomId)) {
                     randomFlightIds.push(randomId)
                     await Ticket.create({flightId: randomId, passengerPassport: passenger.dataValues.passport})
