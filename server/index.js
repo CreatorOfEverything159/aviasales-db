@@ -58,7 +58,7 @@ const start = async () => {
         const airports = [VVO, SVO, AER, LED, OGZ, ABC, ZAH, MEB]
 
         // create flights
-        for (let i = 10; i < 30; i++) {
+        for (let i = 20; i < 40; i++) {
             await Flight.create({
                 number: `AA00${i}`,
                 departureDate: new Date(2022, 2, i, i, i),

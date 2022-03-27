@@ -110,6 +110,25 @@ class UserController {
         return res.json(users)
     }
 
+    async changeUser(req, res, next) {
+        const {login, newPassword, newLogin} = req.body
+        const user = await User.findOne({where: {login}})
+        if (!user) {
+            return next(ApiStatus.badRequest('Нет такого пользователя!'))
+        }
+        const u = await User.findOne({where: {login: newLogin}})
+        if (u) {
+            return next(ApiStatus.badRequest('Такой пользователь уже существует!'))
+        }
+        await User.update({
+            login: newLogin,
+            password: newPassword
+        }, {
+            where: {login}
+        })
+        return res.json({message: 'Пользователь изменен'})
+    }
+
 }
 
 module.exports = new UserController()

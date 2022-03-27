@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react'
 import {Button, Col, Container, Form, Modal, Table} from 'react-bootstrap'
-import {getUser, getUsers, removeUser, searchUser, userRegistration} from '../http/userAPI'
+import {changeUser, getUser, getUsers, removeUser, searchUser, userRegistration} from '../http/userAPI'
 import {useDispatch, useSelector} from 'react-redux'
 import {setUser} from '../store/actions/user'
 
@@ -9,6 +9,9 @@ const Admin = () => {
     const [password, setPassword] = useState('')
     const [findLogin, setFindLogin] = useState('')
     const [operators, setOperators] = useState([])
+
+    const [modalShow, setModalShow] = useState(false)
+    const [modalUser, setModalUser] = useState({})
 
     useEffect(() => {
         getUsers('Оператор')
@@ -46,6 +49,72 @@ const Admin = () => {
         } catch (e) {
             alert(e.response.data.message)
         }
+    }
+
+    const MyVerticallyCenteredModal = (props) => {
+        const [login, setLogin] = useState(props.user.login)
+        const [password, setPassword] = useState(props.user.password)
+
+        const formatter = new Intl.DateTimeFormat("ru", {
+            weekday: "long",
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+            hour: "numeric",
+            minute: "numeric"
+        })
+
+        const change = async () => {
+            try {
+                const data = await changeUser(props.user.login, login, password)
+                alert(data.message)
+                getUsers('Оператор')
+                    .then(data => setOperators(data))
+
+            } catch (e) {
+                alert(e.response.data.message)
+            }
+        }
+
+        return (
+            <Modal {...props} size="lg" aria-labelledby="contained-modal-title-vcenter" centered>
+                <Modal.Header closeButton>
+                    <Modal.Title id="contained-modal-title-vcenter">
+                        Пасажиры
+                        рейса {props?.flight?.number} ({props?.flight?.departureDate ? formatter.format(new Date(props.flight.departureDate)) : ''})
+                    </Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <Form className="">
+                        <Col md={5} style={{padding: '5px'}}>
+                            <Form.Group controlId="formRegistrationLogin">
+                                <Form.Text className="text-muted">
+                                    Логин пользователя
+                                </Form.Text>
+                                <Form.Control type="text" value={login}
+                                              onChange={(e) => setLogin(e.target.value)} placeholder="Логин"/>
+                            </Form.Group>
+                        </Col>
+                        <Col md={5} style={{padding: '5px'}}>
+                            <Form.Group controlId="formRegistrationPassword">
+                                <Form.Text className="text-muted">
+                                    Пароль пользователя
+                                </Form.Text>
+                                <Form.Control value={password} onChange={(e) => {
+                                    setPassword(e.target.value)
+                                }} type="text" placeholder="Пароль"/>
+                            </Form.Group>
+                        </Col>
+                    </Form>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button onClick={() => {
+                        change()
+                        props.onHide()
+                    }}>Сохранить изменения</Button>
+                </Modal.Footer>
+            </Modal>
+        )
     }
 
     return (
@@ -125,6 +194,7 @@ const Admin = () => {
                     <tr>
                         <th>№</th>
                         <th>Логин</th>
+                        <th>Пароль</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -134,11 +204,12 @@ const Admin = () => {
                                     <tr key={operator.login}>
                                         <td>{index + 1}</td>
                                         <td>{operator.login}</td>
+                                        <td>{operator.password}</td>
                                         <td>
-                                            {/*<Button className="me-4" variant="outline-warning" onClick={() => {*/}
-                                            {/*    setModalUser(operator)*/}
-                                            {/*    setModalShow(true)*/}
-                                            {/*}}>Изменить</Button>*/}
+                                            <Button className="me-4" variant="outline-warning" onClick={() => {
+                                                setModalUser(operator)
+                                                setModalShow(true)
+                                            }}>Изменить</Button>
                                             <Button variant="outline-danger" onClick={() => {
                                                 removeOperator(operator.login)
                                             }}>Удалить</Button>
@@ -151,6 +222,10 @@ const Admin = () => {
                     </tbody>
                 </Table>
             </Container>
+            <MyVerticallyCenteredModal
+                user={modalUser}
+                show={modalShow}
+                onHide={() => setModalShow(false)}/>
         </>
     )
 }

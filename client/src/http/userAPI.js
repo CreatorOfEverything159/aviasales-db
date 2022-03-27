@@ -47,3 +47,8 @@ export const passengersByFlight = async (flightId) => {
     const {data} = await $authHost.post('api/passenger',{flightId})
     return data
 }
+
+export const changeUser = async (login, newLogin, newPassword) => {
+    const {data} = await $host.post('api/user/change', {login, newLogin, newPassword})
+    return data
+}
