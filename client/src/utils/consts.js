@@ -1,0 +1,6 @@
+export const LOGIN_ROUTE = '/login'
+export const REGISTRATION_ROUTE = '/registration'
+export const ADMIN_ROUTE = '/admin'
+export const OPERATOR_ROUTE = '/operator'
+export const PASSENGER_ROUTE = '/passenger'
+export const FLIGHTS_ROUTE = '/flights'
